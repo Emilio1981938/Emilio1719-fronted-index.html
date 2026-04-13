@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>EMI 1719 ULTIMATE - Audio Sync Pro</title>
+    <style>
+        /* Estilos base mantenidos para consistencia */
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        body { background: #000000; font-family: 'Courier New', monospace; color: #00ff41; height: 100vh; overflow: hidden; }
+        .cyber-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 20% 50%, #0a0a0a 0%, #000000 100%); z-index: -1; }
+        .app { display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 1; }
+        .header { background: rgba(0,0,0,0.95); border-bottom: 2px solid #00ff41; padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1rem; font-weight: bold; text-shadow: 0 0 5px #00ff41; }
+        .logo span { color: #ff00ff; }
+        .stats { display: flex; gap: 12px; font-size: 0.65rem; background: rgba(0,255,65,0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid #00ff41; }
+        .workspace { display: flex; flex: 1; overflow: hidden; }
+        .tools-panel { width: 280px; background: rgba(5,5,5,0.95); border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; overflow-y: auto; }
+        .preview-panel { flex: 1; display: flex; flex-direction: column; background: #000; }
+        .preview-area { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; margin: 8px; border: 1px solid #1a1a1a; border-radius: 10px; overflow: hidden; }
+        #mainCanvas { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .time-display { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.8); padding: 2px 8px; border-radius: 5px; font-size: 0.8rem; color: #ff00ff; border: 1px solid #ff00ff; }
+        .controls { display: flex; gap: 8px; justify-content: center; padding: 10px; border-top: 1px solid #1a1a1a; flex-wrap: wrap; }
+        .ctrl-btn { background: rgba(0,255,65,0.1); border: 1px solid #00ff41; color: #00ff41; padding: 6px 15px; cursor: pointer; border-radius: 20px; font-size: 0.7rem; }
+        .ctrl-btn:hover { background: #00ff41; color: #000; }
+        .timeline-container { height: 40vh; background: #050505; border-top: 2px solid #00ff41; display: flex; flex-direction: column; position: relative; }
+        .timeline-tracks { flex: 1; overflow: auto; position: relative; }
+        .track { display: flex; height: 50px; border-bottom: 1px solid #1a1a1a; position: relative; }
+        .track-label { width: 80px; background: #000; border-right: 1px solid #333; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; position: sticky; left: 0; z-index: 5; }
+        .track-clips { flex: 1; position: relative; min-width: 2000px; }
+        .clip { position: absolute; height: 40px; top: 5px; background: rgba(0,255,65,0.2); border: 1px solid #00ff41; border-radius: 4px; color: white; font-size: 0.6rem; padding: 5px; overflow: hidden; cursor: move; }
+        .playhead { position: absolute; top: 0; width: 2px; height: 100%; background: #ff00ff; z-index: 10; pointer-events: none; box-shadow: 0 0 10px #ff00ff; }
+        .api-config { padding: 10px; border-bottom: 1px solid #333; }
+        .api-config input { width: 100%; background: #111; border: 1px solid #00ff41; color: #00ff41; padding: 4px; margin: 2px 0; font-size: 0.6rem; }
+        .nav-arrow { background: #111; border: 1px solid #00ff41; color: #00ff41; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="cyber-bg"></div>
+<div class="app">
+    <div class="header">
+        <div class="logo">🎬 EMI 1719 <span>ULTIMATE</span> | SYNC FIX</div>
+        <div class="stats">🎬 <span id="vCount">0</span> | 🎵 <span id="aCount">0</span> | 🖼️ <span id="iCount">0</span></div>
+    </div>
+    
+    <div class="workspace">
+        <div class="tools-panel">
+            <div class="api-config">
+                <h4 style="font-size: 0.7rem; color: #ff00ff;">🔑 API KEYS</h4>
+                <input type="text" id="ccKey" placeholder="CloudConvert">
+                <input type="text" id="repKey" placeholder="Replicate">
+                <button onclick="saveKeys()" class="ctrl-btn" style="width: 100%; margin-top: 5px;">💾 GUARDAR CLAVES</button>
+            </div>
+            <div style="padding: 15px; text-align: center;">
+                <div id="effName" style="color: #ff00ff; margin-bottom: 10px;">Efecto: Corte 1</div>
+                <button class="nav-arrow" onclick="changeEff(-1)">◀</button>
+                <button class="ctrl-btn" onclick="applyEff()">APLICAR</button>
+                <button class="nav-arrow" onclick="changeEff(1)">▶</button>
+            </div>
+        </div>
+
+        <div class="preview-panel">
+            <div class="preview-area">
+                <canvas id="mainCanvas" width="800" height="450"></canvas>
+                <div class="time-display" id="timeDisplay">00:00:00</div>
+            </div>
+            <div class="controls">
+                <button class="ctrl-btn" id="playBtn">▶ PLAY (SYNC)</button>
+                <button class="ctrl-btn" id="stopBtn">⏹ STOP</button>
+                <button class="ctrl-btn" onclick="importFile('video')">📹 VIDEO</button>
+                <button class="ctrl-btn" onclick="importFile('image')">🖼️ FOTO</button>
+                <button class="ctrl-btn" onclick="importFile('audio')">🎵 AUDIO (REAL)</button>
+                <button class="ctrl-btn" style="border-color: #ff00ff;" onclick="exportVideo()">🎬 EXPORTAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="timeline-container">
+        <div class="timeline-tracks" id="tlTracks">
+            <div class="playhead" id="playhead"></div>
+            <div class="track"><div class="track-label">VIDEO</div><div class="track-clips" id="vTrack"></div></div>
+            <div class="track"><div class="track-label">AUDIO</div><div class="track-clips" id="aTrack"></div></div>
+            <div class="track"><div class="track-label">FOTOS</div><div class="track-clips" id="iTrack"></div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- ESTADO GLOBAL ---
+    let currentTime = 0;
+    let isPlaying = false;
+    let zoom = 20;
+    let timeline = { video: [], audio: [], image: [] };
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // --- MOTOR DE AUDIO PRO (SIN RETRASO) ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let audioSources = []; // Almacena nodos de audio activos
+
+    // Cargar audio como Buffer para latencia cero
+    async function loadAudioBuffer(url) {
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
+        return await audioCtx.decodeAudioData(arrayBuffer);
+    }
+
+    // --- FUNCIONES CORE ---
+    function importFile(type) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = type === 'audio' ? 'audio/*' : (type === 'image' ? 'image/*' : 'video/*');
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            const url = URL.createObjectURL(file);
+            const clip = {
+                id: Date.now(),
+                name: file.name,
+                start: currentTime,
+                duration: type === 'image' ? 5 : 10,
+                url: url,
+                type: type
+            };
+
+            if (type === 'audio') {
+                notify("⏳ Decodificando audio...");
+                clip.buffer = await loadAudioBuffer(url);
+                clip.duration = clip.buffer.duration;
+                notify("✅ Audio Sincronizado");
+            }
+
+            timeline[type].push(clip);
+            renderTimeline();
+            updateStats();
+        };
+        input.click();
+    }
+
+    function renderTimeline() {
+        ['video', 'audio', 'image'].forEach(type => {
+            const container = document.getElementById(type[0] + 'Track');
+            container.innerHTML = '';
+            timeline[type].forEach(clip => {
+                const div = document.createElement('div');
+                div.className = 'clip';
+                div.style.left = (clip.start * zoom) + 'px';
+                div.style.width = (clip.duration * zoom) + 'px';
+                div.innerHTML = `<span>${clip.name}</span>`;
+                container.appendChild(div);
+            });
+        });
+    }
+
+    // --- LOOP DE REPRODUCCIÓN (SINCRONIZADO) ---
+    let lastFrameTime = 0;
+
+    function play() {
+        if (isPlaying) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        isPlaying = true;
+        lastFrameTime = performance.now();
+        
+        // Iniciar audios que deberían estar sonando
+        syncAudio();
+        requestAnimationFrame(update);
+    }
+
+    function stop() {
+        isPlaying = false;
+        currentTime = 0;
+        stopAllAudio();
+        updateUI();
+    }
+
+    function stopAllAudio() {
+        audioSources.forEach(src => { try { src.stop(); } catch(e){} });
+        audioSources = [];
+    }
+
+    function syncAudio() {
+        stopAllAudio();
+        if (!isPlaying) return;
+
+        timeline.audio.forEach(clip => {
+            if (currentTime >= clip.start && currentTime < (clip.start + clip.duration)) {
+                const source = audioCtx.createBufferSource();
+                source.buffer = clip.buffer;
+                source.connect(audioCtx.destination);
+                
+                const offset = currentTime - clip.start;
+                source.start(0, offset);
+                audioSources.push(source);
+            }
+        });
+    }
+
+    function update(now) {
+        if (!isPlaying) return;
+
+        const deltaTime = (now - lastFrameTime) / 1000;
+        lastFrameTime = now;
+        currentTime += deltaTime;
+
+        // Auto-corrección de audio cada 1 segundo para evitar drift
+        if (Math.floor(currentTime) > Math.floor(currentTime - deltaTime)) {
+            syncAudio(); 
+        }
+
+        updateUI();
+        drawPreview();
+        requestAnimationFrame(update);
+    }
+
+    function updateUI() {
+        document.getElementById('playhead').style.left = (currentTime * zoom) + 'px';
+        const mins = Math.floor(currentTime / 60);
+        const secs = Math.floor(currentTime % 60);
+        document.getElementById('timeDisplay').innerText = 
+            `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}:00`;
+    }
+
+    function drawPreview() {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0,0, canvas.width, canvas.height);
+        
+        // Dibujar imagen actual
+        const activeImg = timeline.image.find(img => currentTime >= img.start && currentTime < img.start + img.duration);
+        if (activeImg) {
+            const imgObj = new Image();
+            imgObj.src = activeImg.url;
+            ctx.drawImage(imgObj, 0, 0, canvas.width, canvas.height);
+        } else {
+            ctx.fillStyle = '#00ff41';
+            ctx.font = '20px Courier New';
+            ctx.fillText("EMI 1719 ENGINE", 50, 50);
+        }
+    }
+
+    // --- UTILIDADES ---
+    function notify(msg) {
+        const n = document.createElement('div');
+        n.style = "position:fixed; top:20px; right:20px; background:#ff00ff; color:white; padding:10px; z-index:9999; border-radius:5px;";
+        n.innerText = msg;
+        document.body.appendChild(n);
+        setTimeout(() => n.remove(), 2000);
+    }
+
+    function updateStats() {
+        document.getElementById('vCount').innerText = timeline.video.length;
+        document.getElementById('aCount').innerText = timeline.audio.length;
+        document.getElementById('iCount').innerText = timeline.image.length;
+    }
+
+    function saveKeys() {
+        localStorage.setItem('cc', document.getElementById('ccKey').value);
+        notify("Claves Guardadas");
+    }
+
+    // Eventos
+    document.getElementById('playBtn').onclick = () => isPlaying ? stop() : play();
+    document.getElementById('stopBtn').onclick = stop;
+
+    // Inicialización
+    updateUI();
+</script>
+</body>
+</html>
