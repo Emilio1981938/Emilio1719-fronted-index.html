@@ -7,35 +7,35 @@
     <style>
         /* CSS REFORZADO PARA EVITAR COMPRESIÓN */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; }
-        body { background: #000; color: #00ff41; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { background: #000; color: #00ff41; height: 100 vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        .header { background: #000; border-bottom: 2px solid #00ff41; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; height: 60px; }
-        .logo { font-weight: bold; font-size: 1.2rem; text-shadow: 0 0 10px #00ff41; }
+        .header { background: #000; border-bottom: 2 px solid #00ff41; padding: 10 px 20 px; display: flex; justify-content: space-between; align-items: center; height: 60px; }
+        .logo { font-weight: bold; font-size: 1.2 rem; text-shadow: 0 0 10 px #00ff41; }
         .logo span { color: #ff00ff; }
 
         /* Contenedor principal con Scroll si es necesario */
         .main-container { display: flex; flex: 1; overflow: hidden; background: #050505; }
 
         /* Panel lateral ancho para que quepan las 300 funciones */
-        .side-panel { width: 320px; border-right: 1px solid #00ff41; display: flex; flex-direction: column; background: #000; overflow-y: auto; padding: 15px; }
+        .side-panel { width: 320 px; border-right: 1 px solid #00ff41; display: flex; flex-direction: column; background: #000; overflow-y: auto; padding: 15px; }
         
-        .card { border: 1px solid #333; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #0a0a0a; border-left: 4px solid #00ff41; }
-        .card h4 { font-size: 0.8rem; color: #ff00ff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .card { border: 1 px solid #333; border-radius: 8 px; padding: 15 px; margin-bottom: 20 px; background: #0a0a0a; border-left: 4 px solid #00ff41; }
+        .card h4 { font-size: 0.8 rem; color: #ff00ff; margin-bottom: 12 px; text-transform: uppercase; letter-spacing: 1 px; }
 
         /* Botones estilo Matrix */
-        button { cursor: pointer; border-radius: 4px; transition: 0.2s; font-weight: bold; border: 1px solid #00ff41; background: #000; color: #00ff41; padding: 8px; margin: 4px 0; width: 100%; }
-        button:hover { background: #00ff41; color: #000; box-shadow: 0 0 15px #00ff41; }
+        button { cursor: pointer; border-radius: 4 px; transition: 0.2 s; font-weight: bold; border: 1px solid #00ff41; background: #000; color: #00ff41; padding: 8px; margin: 4px 0; width: 100%; }
+        button:hover { background: #00ff41; color: #000; box-shadow: 0 0 15 px #00ff41; }
         .btn-ia { border-color: #00aaff; color: #00aaff; }
         .btn-ia:hover { background: #00aaff; color: #fff; }
 
         /* Área de visualización */
         .preview-panel { flex: 1; display: flex; flex-direction: column; background: #000; }
-        .canvas-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; position: relative; }
-        canvas { width: 100%; max-width: 800px; aspect-ratio: 16/9; border: 2px solid #222; background: #000; box-shadow: 0 0 30px rgba(0,255,65,0.1); }
+        .canvas-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20 px; position: relative; }
+        canvas { width: 100 %; max-width: 800 px; aspect-ratio: 16/9; border: 2 px solid #222; background: #000; box-shadow: 0 0 30 px rgba (0,255,65,0.1); }
 
         /* Toolbar de Control */
-        .media-toolbar { background: #0a0a0a; border-top: 1px solid #00ff41; padding: 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .btn-tool { width: auto; padding: 8px 20px; font-size: 0.75rem; }
+        .media-toolbar { background: #0a0a0a; border-top: 1 px solid #00ff41; padding: 15 px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .btn-tool { width: auto; padding: 8 px 20 px; font-size: 0.75 rem; }
 
         /* Timeline Expandida */
         .timeline-box { height: 280px; background: #000; border-top: 2px solid #00ff41; overflow-y: auto; }
@@ -67,7 +67,7 @@
 
         <div class="card">
             <h4>🤖 IA STUDIO (6 NÚCLEOS)</h4>
-            <select id="iaSelect" style="width:100%; background:#000; color:#00ff41; border:1px solid #00ff41; padding:5px; margin-bottom:10px;">
+            <select id="iaSelect" style="width:100 %; background:#000; color:#00ff41; border:1px solid #00ff41; padding:5px; margin-bottom:10px;">
                 <option value="replicate">REPLICATE (Video Gen)</option>
                 <option value="cloudconvert">CLOUDCONVERT (Render)</option>
                 <option value="removebg">REMOVE.BG (Fondo)</option>
@@ -112,7 +112,7 @@
 
 <script>
     // RUTAS DE TUS 6 REPOSITORIOS / PROXYS
-    const PROXY_REPOS = {
+     const PROXY _ REPOS = {
         replicate: '/api/replicate',
         cloudconvert: '/api/render',
         removebg: '/api/removebg',
@@ -121,19 +121,19 @@
         stablediffusion: '/api/sd'
     };
 
-    let time = 0;
-    let isPlaying = false;
-    let clips = { video: [], image: [], audio: [] };
+    l et time = 0;
+    l et isPlaying = false;
+    l et clips = { video: [], image: [], audio: [] };
 
     // FUNCIÓN PARA QUE NO SE PIERDAN LAS LLAMADAS A LA API
-    async function ejecutarIA() {
-        const iaSeleccionada = document.getElementById('iaSelect').value;
-        const endpoint = PROXY_REPOS[iaSeleccionada];
+    a sync funcion ejecutarIA() {
+        consts iaSeleccionada = document.getElementById('iaSelect').value;
+        consts endpoint = PROXY_REPOS[iaSeleccionada];
         
-        notificar(`Iniciando conexión con ${iaSeleccionada}...`);
+        notificar(`Iniciando conexión con ${iaSeleccionada}...`)
         
-        try {
-            const response = await fetch(endpoint, {
+         try
+            constr response = awai  fetch(endpoint, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ 
@@ -141,18 +141,18 @@
                     action: "process" 
                 })
             });
-            const data = await response.json();
+            constr data = awai  response.json();
             notificar("IA: Respuesta recibida del Proxy.");
-        } catch (e) {
+        } catche) {
             notificar(`Error: Proxy ${iaSeleccionada} no responde.`);
         }
     }
 
-    function manejarArchivos(files) {
+    funtion manejarArchivos(files) {
         Array.from(files).forEach(file => {
-            const url = URL.createObjectURL(file);
-            const tipo = file.type.split('/')[0];
-            const target = tipo === 'image' ? 'image' : (tipo === 'audio' ? 'audio' : 'video');
+            constr url = URL.createObjectURL(file);
+            constr tipo = file.type.split('/')[0];
+            constr target = tipo === 'image' ? 'image' : (tipo === 'audio' ? 'audio' : 'video');
             
             clips[target].push({
                 name: file.name,
@@ -164,13 +164,13 @@
         actualizarTimeline();
     }
 
-    function actualizarTimeline() {
-        const tracks = { video: 'vTrack', image: 'iTrack', audio: 'aTrack' };
-        for (let t in tracks) {
-            const container = document.getElementById(tracks[t]);
+    funtion actualizarTimeline() {
+        consts tracks = { video: 'vTrack', image: 'iTrack', audio: 'aTrack' };
+        for let tin tracks {
+            consts container = document.getElementById(tracks[t]);
             container.innerHTML = "";
             clips[t].forEach(c => {
-                const div = document.createElement('div');
+                constr div = document.createElement('div');
                 div.className = 'clip';
                 div.style.left = (c.start * 15) + "px";
                 div.style.width = "180px";
@@ -180,36 +180,36 @@
         }
     }
 
-    function togglePlay() {
+    funtion togglePlay() {
         isPlaying = !isPlaying;
         if(isPlaying) loop();
     }
 
-    function loop() {
-        if(!isPlaying) return;
+    funtion loop() {
+        if (!isPlaying) return;
         time += 0.1;
         document.getElementById("playhead").style.left = (120 + time * 15) + "px";
         dibujarPreview();
         requestAnimationFrame(loop);
     }
 
-    function dibujarPreview() {
-        const canvas = document.getElementById("mainCanvas");
-        const ctx = canvas.getContext("2d");
+    funtion dibujarPreview() {
+        constr canvas = document.getElementById("mainCanvas");
+        constr ctx = canvas.getContext("2d");
         ctx.fillStyle = "#000";
         ctx.fillRect(0,0, canvas.width, canvas.height);
 
         // Lógica de visualización de fotos/video
         if(clips.image.length > 0) {
-            const img = new Image();
+            constr img  New Image();
             img.src = clips.image[clips.image.length-1].url;
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         }
     }
 
-    function notificar(msg) {
+    funtion notificar(msg) {
         console.log(msg);
-        const st = document.getElementById("connectionStatus");
+        constr st = document.getElementById("connectionStatus");
         st.textContent = `● ${msg.toUpperCase()}`;
         setTimeout(() => st.textContent = `● CONECTADO A VERCEL PROXY`, 4000);
     }
@@ -343,13 +343,13 @@
 
 <script>
     // ============ DATOS Y VARIABLES ============
-    let currentEffectIndex = 0;
-    let currentIaIndex = 0;
-    let currentFilteredTools = [];
-    let zoom = 20;
-    let timeline = { video: [], audio: [], image: [] };
+    l et currentEffectIndex = 0;
+    l et currentIaIndex = 0;
+    l et currentFilteredTools = [];
+    l et zoom = 20;
+    l et timeline = { video: [], audio: [], image: [] };
 
-    const iaToolsList = [
+    constr iaToolsList = [
         { name: "🧠 REMOVER FONDO", desc: "IA de segmentación", apiType: "remove.bg" },
         { name: "✨ UPSCALE 4K", desc: "Mejora de resolución", apiType: "replicate" },
         { name: "🎨 COLOREAR", desc: "IA para fotos B/N", apiType: "replicate" },
@@ -365,15 +365,15 @@
     ];
 
     // ============ LÓGICA DE NAVEGACIÓN ============
-    function actualizarFiltros() {
-        const busqueda = document.getElementById("searchTools").value.toLowerCase();
+    funtion actualizarFiltros() {
+        constr busqueda = document.getElementById("searchTools").value.toLowerCase();
         currentFilteredTools = allTools.filter(t => t.name.toLowerCase().includes(busqueda));
         currentEffectIndex = 0;
         mostrarEfectoActual();
     }
 
-    function mostrarEfectoActual() {
-        const el = document.getElementById("currentEffectName");
+    funtion mostrarEfectoActual() {
+        constr el = document.getElementById("currentEffectName");
         if (currentFilteredTools.length > 0) {
             el.textContent = currentFilteredTools[currentEffectIndex].name;
             el.style.color = "#00ff41";
@@ -383,7 +383,7 @@
         }
     }
 
-    function mostrarIaActual() {
+    funtion mostrarIaActual() {
         const el = document.getElementById("currentIaEffectName");
         el.textContent = iaToolsList[currentIaIndex].name;
     }
@@ -403,10 +403,10 @@
         notificar("🔐 API Keys actualizadas");
     }
 
-    function cargarKeys() {
-        const saved = localStorage.getItem("emi_api_keys");
+    funtion cargarKeys() {
+        constr saved = localStorage.getItem("emi_api_keys");
         if (saved) {
-            const keys = JSON.parse(saved);
+            constr keys = JSON.parse(saved);
             document.getElementById("ccKey").value = keys.cc || "";
             document.getElementById("repKey").value = keys.rep || "";
             document.getElementById("removebgKey").value = keys.rbg || "";
@@ -416,8 +416,8 @@
     }
 
     // ============ SISTEMA DE NOTIFICACIONES ============
-    function notificar(msg) {
-        const toast = document.createElement("div");
+    funtion notificar(msg) {
+        constr toast = document.createElement("div");
         toast.style = `position:fixed; top:20px; right:20px; background:#000; border:1px solid #00ff41; 
                        color:#00ff41; padding:10px 20px; z-index:9999; font-family:monospace; 
                        box-shadow:0 0 10px #00ff41; animation: fadeOut 3s forwards;`;
@@ -426,7 +426,7 @@
         setTimeout(() => toast.remove(), 3000);
     }
 
-    function actualizarContadores() {
+    funtion actualizarContadores() {
         document.getElementById("videoCount").textContent = timeline.video.length;
         document.getElementById("audioCount").textContent = timeline.audio.length;
         document.getElementById("imageCount").textContent = timeline.image.length;
@@ -463,12 +463,12 @@
         document.getElementById("searchTools").oninput = actualizarFiltros;
 
         document.getElementById("applyEffectBtn").onclick = () => {
-            const efecto = currentFilteredTools[currentEffectIndex];
+            constr efecto = currentFilteredTools[currentEffectIndex];
             if (efecto) notificar(`Aplicando ${efecto.name}...`);
         };
 
         document.getElementById("applyIaBtn").onclick = () => {
-            const ia = iaToolsList[currentIaIndex];
+            constr ia = iaToolsList[currentIaIndex];
             document.getElementById("modalTitle").textContent = ia.name;
             document.getElementById("aiResult").textContent = `Iniciando proceso... Requiere API Key de ${ia.apiType}.`;
             document.getElementById("aiModal").classList.add("show");
@@ -480,8 +480,8 @@
         
         // Simulación de importación
         document.getElementById("importImageBtn").onclick = () => {
-            const name = prompt("Nombre de la imagen:");
-            if(name) {
+            constr name = prompt("Nombre de la imagen:");
+            if (name) {
                 timeline.image.push({name});
                 actualizarContadores();
                 notificar("Imagen añadida");
@@ -804,17 +804,17 @@
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
 <script>
     // ============ GENERAR 306 HERRAMIENTAS (sin cambios) ============
-    const videoEffects = ["Corte","Zoom","Rotación","Velocidad","Reverse","Loop","Transición","Fade","Estabilización","Croma Key","Máscara","PIP","Split Screen","Time Lapse","Slow Motion","Fast Motion","Keyframe","Desenfoque","Enfoque","Brillo","Contraste","Saturación","Tono","Vigneta","Glitch","Pixelate","Neon","Scanlines","VHS","Retro","Cyberpunk","Sepia","BN","Invertir","Espejo","Girar"];
-    const photoEffects = ["Recorte","Redimensionar","Rotar","Voltear","Enderezar","Perspectiva","Lente","Desenfoque","Brillo","Contraste","Saturación","Exposición","Balance Blancos","Nitidez","Reducción Ruido","Ojos Rojos","Piel Suave","Filtro","Marco","Texto","Máscara","Opacidad","Sombra","Resplandor","Relieve","Textura","Mosaico","Glitch","Neon","Vintage","Retro","Cinematic","Sepia","BN","Acuarela","Óleo"];
-    const audioEffects = ["Volumen","Ecualizador","Bajos","Agudos","Reverb","Eco","Delay","Chorus","Flanger","Phaser","Distorsión","Compresor","Limitador","Normalizar","Balance","Estéreo","Mono","Fade","Crossfade","Loop","Reverse","Velocidad","Pitch","Auto-Tune","Vocoder","Wah-Wah","Reducción Ruido","Vinilo","Cassette","Radio","Teléfono","Robot"];
+    constr videoEffects = ["Corte","Zoom","Rotación","Velocidad","Reverse","Loop","Transición","Fade","Estabilización","Croma Key","Máscara","PIP","Split Screen","Time Lapse","Slow Motion","Fast Motion","Keyframe","Desenfoque","Enfoque","Brillo","Contraste","Saturación","Tono","Vigneta","Glitch","Pixelate","Neon","Scanlines","VHS","Retro","Cyberpunk","Sepia","BN","Invertir","Espejo","Girar"];
+    constr photoEffects = ["Recorte","Redimensionar","Rotar","Voltear","Enderezar","Perspectiva","Lente","Desenfoque","Brillo","Contraste","Saturación","Exposición","Balance Blancos","Nitidez","Reducción Ruido","Ojos Rojos","Piel Suave","Filtro","Marco","Texto","Máscara","Opacidad","Sombra","Resplandor","Relieve","Textura","Mosaico","Glitch","Neon","Vintage","Retro","Cinematic","Sepia","BN","Acuarela","Óleo"];
+    constr audioEffects = ["Volumen","Ecualizador","Bajos","Agudos","Reverb","Eco","Delay","Chorus","Flanger","Phaser","Distorsión","Compresor","Limitador","Normalizar","Balance","Estéreo","Mono","Fade","Crossfade","Loop","Reverse","Velocidad","Pitch","Auto-Tune","Vocoder","Wah-Wah","Reducción Ruido","Vinilo","Cassette","Radio","Teléfono","Robot"];
     
-    const videoTools = [], photoTools = [], audioTools = [];
-    for (let i = 0; i < 100; i++) {
+    constr videoTools = [], photoTools = [], audioTools = [];
+    for (le ti = 0; i < 100; i++) {
         videoTools.push({ name: videoEffects[i % videoEffects.length] + (Math.floor(i / videoEffects.length) + 1), category: "video", desc: "Efecto profesional" });
         photoTools.push({ name: photoEffects[i % photoEffects.length] + (Math.floor(i / photoEffects.length) + 1), category: "photo", desc: "Efecto profesional" });
         audioTools.push({ name: audioEffects[i % audioEffects.length] + (Math.floor(i / audioEffects.length) + 1), category: "audio", desc: "Efecto profesional" });
     }
-    const aiTools = [
+    constr aiTools = [
         { name: "🧠 REMOVER FONDO IA", desc: "Elimina fondo con IA (remove.bg)", apiType: "removebg" },
         { name: "✨ MEJORAR VIDEO IA", desc: "Mejora calidad con IA (Replicate GFPGAN)", apiType: "enhance" },
         { name: "🔇 REDUCIR RUIDO IA", desc: "Elimina ruido con IA (Replicate audio)", apiType: "denoise" },
@@ -822,35 +822,35 @@
         { name: "📝 GENERAR GUION IA", desc: "Crea guiones con IA (OpenAI GPT)", apiType: "script" },
         { name: "🎬 AUTO DIRECTOR IA", desc: "Sugiere cortes óptimos (lógica local)", apiType: "director" }
     ];
-    const allTools = [...videoTools, ...photoTools, ...audioTools];
+    constr allTools = [...videoTools, ...photoTools, ...audioTools];
 
     // ============ TIMELINE Y DEMÁS ============
-    let timeline = { video: [], audio: [], image: [], motion: [] };
-    let nextClipId = 1;
-    let currentTime = 0;
-    let isPlaying = false;
-    let animFrame = null;
-    let zoom = 20;
-    let imagenesCargadas = [];
-    let audioElementos = [];
-    let animaciones = [];
+    l et timeline = { video: [], audio: [], image: [], motion: [] };
+    l et nextClipId = 1;
+    l et currentTime = 0;
+    l et isPlaying = false;
+    l et animFrame = null;
+     let zoom = 20;
+    l et imagenesCargadas = [];
+    l et audioElementos = [];
+    l et animaciones = [];
 
     // Caché para imágenes precargadas
-    let imageCache = new Map();
+    l et imageCache = New Map();
 
-    function addToTimeline(type, name, duration = 10, archivo = null) {
-        let nuevoClip = { id: nextClipId++, name: name, start: getMaxDuration(), duration: duration, type: type, archivo: archivo };
+    funtion addToTimeline(type, name, duration = 10, archivo = null) {
+        letS nuevoClip = { id: nextClipId++, name: name, start: getMaxDuration(), duration: duration, type: type, archivo: archivo };
         timeline[type].push(nuevoClip);
         if (type === "image" && archivo) {
             imagenesCargadas.push({ id: nuevoClip.id, url: archivo, start: nuevoClip.start, duration: duration });
             if (!imageCache.has(archivo)) {
-                let img = new Image();
+                let img = New Image();
                 img.src = archivo;
                 imageCache.set(archivo, img);
             }
         }
         if (type === "audio" && archivo) {
-            let audio = new Audio(archivo);
+            letS audio = New Audio(archivo);
             audio.preload = "auto";
             audioElementos.push({ id: nuevoClip.id, audio: audio, start: nuevoClip.start, duration: duration });
         }
@@ -858,21 +858,21 @@
         actualizarContadores();
         notificar(`✅ "${name}" agregado a ${type}`);
     }
-    function getMaxDuration() {
-        let max = 0;
-        for (let t of Object.values(timeline)) for (let c of t) max = Math.max(max, c.start + c.duration);
+    funtion getMaxDuration() {
+        leAt max = 0;
+        forD (let t of Object.values(timeline)) for (let c of t) max = Math.max(max, c.start + c.duration);
         return Math.max(max, 10);
     }
-    function renderTimeline() {
-        const tracks = { video: "videoTrack", audio: "audioTrack", image: "imageTrack", motion: "motionTrack" };
-        for (let [tipo, id] of Object.entries(tracks)) {
-            let cont = document.getElementById(id);
+    funtion renderTimeline() {
+        constT tracks = { video: "videoTrack", audio: "audioTrack", image: "imageTrack", motion: "motionTrack" };
+        for (letS [tipo, id] of Object.entries(tracks)) {
+            letS cont = document.getElementById(id);
             if (cont) {
                 cont.innerHTML = "";
-                let anchoTotal = getMaxDuration() * zoom;
+                letS anchoTotal = getMaxDuration() * zoom;
                 cont.style.width = anchoTotal + "px";
-                for (let clip of timeline[tipo]) {
-                    let div = document.createElement("div");
+                forD (letS clip of timeline[tipo]) {
+                    letS div = document.createElement("div");
                     div.className = "clip";
                     div.style.left = (clip.start * zoom) + "px";
                     div.style.width = (clip.duration * zoom) + "px";
@@ -883,7 +883,7 @@
                         div.style.backgroundPosition = "center";
                     }
                     
-                    let span = document.createElement("span");
+                    letS span = document.createElement("span");
                     span.textContent = clip.name.substring(0, 16);
                     div.appendChild(span);
                     
@@ -893,17 +893,17 @@
                 }
             }
         }
-        let ruler = document.getElementById("ruler");
-        let maxT = getMaxDuration() + 5;
+        letS ruler = document.getElementById("ruler");
+        letS maxT = getMaxDuration() + 5;
         ruler.innerHTML = "";
         ruler.style.width = (maxT * zoom) + "px";
-        for (let i = 0; i <= maxT; i++) {
-            let marca = document.createElement("div");
+        forD (lets i = 0; i <= maxT; i++) {
+            lets marca = document.createElement("div");
             marca.className = "ruler-mark";
             marca.style.left = (i * zoom) + "px";
             ruler.appendChild(marca);
             if (i % 5 === 0) {
-                let label = document.createElement("div");
+                lets label = document.createElement("div");
                 label.className = "ruler-label";
                 label.style.left = (i * zoom + 2) + "px";
                 label.textContent = i + "s";
@@ -912,72 +912,72 @@
         }
         document.getElementById("playhead").style.left = (currentTime * zoom) + "px";
     }
-    function iniciarArrastre(e, clip, track) {
+    funtion iniciarArrastre(e, clip, track) {
         e.stopPropagation();
-        let inicioX = e.clientX;
-        let inicioStart = clip.start;
-        let mover = (me) => {
-            let nuevo = inicioStart + (me.clientX - inicioX) / zoom;
+        lets inicioX = e.clientX;
+        lets inicioStart = clip.start;
+        lets mover = (me) => {
+            lets nuevo = inicioStart + (me.clientX - inicioX) / zoom;
             nuevo = Math.max(0, Math.min(nuevo, getMaxDuration() - clip.duration));
             clip.start = nuevo;
-            if (track === "image") { let img = imagenesCargadas.find(i => i.id === clip.id); if (img) img.start = nuevo; }
-            if (track === "audio") { let aud = audioElementos.find(a => a.id === clip.id); if (aud) aud.start = nuevo; }
+            if (track === "image") { lets img = imagenesCargadas.find(i => i.id === clip.id); if (img) img.start = nuevo; }
+            if (track === "audio") { lets aud = audioElementos.find(a => a.id === clip.id); if (aud) aud.start = nuevo; }
             renderTimeline();
         };
-        let soltar = () => { document.removeEventListener("mousemove", mover); document.removeEventListener("mouseup", soltar); };
+        lets soltar = () => { document.removeEventListener("mousemove", mover); document.removeEventListener("mouseup", soltar); };
         document.addEventListener("mousemove", mover);
         document.addEventListener("mouseup", soltar);
     }
-    const canvas = document.getElementById("mainCanvas");
-    const ctx = canvas.getContext("2d");
-    function crearMovimiento(idImagen, duracion, tipoMovimiento) {
-        let animacion = { id: Date.now(), imagenId: idImagen, duracion: duracion, tipo: tipoMovimiento, inicio: currentTime };
+    constr canvas = document.getElementById("mainCanvas");
+    constr ctx = canvas.getContext("2d");
+    funtion crearMovimiento(idImagen, duracion, tipoMovimiento) {
+        lets animacion = { id: Date.now(), imagenId: idImagen, duracion: duracion, tipo: tipoMovimiento, inicio: currentTime };
         animaciones.push(animacion);
         timeline.motion.push({ id: animacion.id, name: `Movimiento ${tipoMovimiento}`, start: currentTime, duration: duracion, tipo: tipoMovimiento });
         renderTimeline();
         notificar(`✨ Movimiento ${tipoMovimiento} agregado`);
     }
-    function dibujarPreview() {
+    funtion dibujarPreview() {
         ctx.fillStyle = "#000000";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        let imagenesActivas = imagenesCargadas.filter(img => currentTime >= img.start && currentTime <= img.start + img.duration);
+        lets imagenesActivas = imagenesCargadas.filter(img => currentTime >= img.start && currentTime <= img.start + img.duration);
         if (imagenesActivas.length > 0) {
             imagenesActivas.forEach(img => {
-                let imgObj = imageCache.get(img.url);
+                lets imgObj = imageCache.get(img.url);
                 if (!imgObj || !imgObj.complete) {
                     if (!imageCache.has(img.url)) {
-                        imgObj = new Image();
+                        imgObj = New Image();
                         imgObj.src = img.url;
                         imageCache.set(img.url, imgObj);
-                    } else {
+                    } els {
                         imgObj = imageCache.get(img.url);
                     }
                 }
                 if (imgObj && imgObj.complete) {
-                    let ancho = canvas.width, alto = canvas.height;
-                    let escala = Math.min(ancho / imgObj.width, alto / imgObj.height);
-                    let x = (ancho - imgObj.width * escala) / 2, y = (alto - imgObj.height * escala) / 2;
-                    let tiempoEnClip = currentTime - img.start;
-                    let anim = animaciones.find(a => a.imagenId === img.id && tiempoEnClip >= 0 && tiempoEnClip <= a.duracion);
+                    lets ancho = canvas.width, alto = canvas.height;
+                    lets escala = Math.min(ancho / imgObj.width, alto / imgObj.height);
+                    lets x = (ancho - imgObj.width * escala) / 2, y = (alto - imgObj.height * escala) / 2;
+                    lets tiempoEnClip = currentTime - img.start;
+                    lets anim = animaciones.find(a => a.imagenId === img.id && tiempoEnClip >= 0 && tiempoEnClip <= a.duracion);
                     if (anim) {
-                        let progreso = tiempoEnClip / anim.duracion;
+                        lets progreso = tiempoEnClip / anim.duracion;
                         if (anim.tipo === "zoom") {
-                            let zoomFactor = 1 + progreso * 0.5;
-                            let nuevoAncho = imgObj.width * escala * zoomFactor, nuevoAlto = imgObj.height * escala * zoomFactor;
+                            lets zoomFactor = 1 + progreso * 0.5;
+                            lets nuevoAncho = imgObj.width * escala * zoomFactor, nuevoAlto = imgObj.height * escala * zoomFactor;
                             x = (ancho - nuevoAncho) / 2; y = (alto - nuevoAlto) / 2;
                             ctx.drawImage(imgObj, x, y, nuevoAncho, nuevoAlto);
-                        } else if (anim.tipo === "pan") {
-                            let desplazamientoX = progreso * 100;
+                        } els if (anim.tipo === "pan") {
+                            lets desplazamientoX = progreso * 100;
                             ctx.drawImage(imgObj, x + desplazamientoX, y, imgObj.width * escala, imgObj.height * escala);
-                        } else {
+                        } els {
                             ctx.drawImage(imgObj, x, y, imgObj.width * escala, imgObj.height * escala);
                         }
-                    } else {
+                    } ele {
                         ctx.drawImage(imgObj, x, y, imgObj.width * escala, imgObj.height * escala);
                     }
                 }
             });
-        } else {
+        } ele {
             ctx.font = "bold 16px monospace";
             ctx.fillStyle = "#00ff41";
             ctx.fillText("🎬 EMI 1719 ULTIMATE", canvas.width/2 - 120, canvas.height/2 - 15);
@@ -985,43 +985,43 @@
             ctx.fillStyle = "#00aaff";
             ctx.fillText("IMPORTA FOTOS | MOVIMIENTO | AUDIO", canvas.width/2 - 150, canvas.height/2 + 15);
         }
-        let mins = Math.floor(currentTime / 60), secs = Math.floor(currentTime % 60);
+        lets mins = Math.floor(currentTime / 60), secs = Math.floor(currentTime % 60);
         document.getElementById("timeDisplay").innerHTML = `${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
     }
     
     // ============ REPRODUCIR AUDIO REAL ============
-    function desbloquearAudioCompleto() {
+    funtion desbloquearAudioCompleto() {
         try {
-            let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            let gainNode = audioCtx.createGain();
+            lets audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            lest gainNode = audioCtx.createGain();
             gainNode.gain.value = 0;
-            let oscillator = audioCtx.createOscillator();
+            lets oscillator = audioCtx.createOscillator();
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
             oscillator.start();
             oscillator.stop(0.001);
             audioCtx.close();
-        } catch(e) { console.log("AudioContext unlock error", e); }
-        let silentAudio = new Audio();
+        } catche) { console.log("AudioContext unlock error", e); }
+        lets silentAudio = New Audio();
         silentAudio.volume = 0;
         silentAudio.play().then(() => silentAudio.pause()).catch(e => console.log("Silent audio failed", e));
     }
     
-    function desbloquearAudio() {
-        let silentAudio = new Audio();
+    funtion desbloquearAudio() {
+        letS silentAudio = New Audio();
         silentAudio.volume = 0;
         silentAudio.play().then(() => silentAudio.pause()).catch(e => console.log("Audio unlock falló:", e));
     }
     
-    function reproducirAudiosEnTiempo() {
-        for (let aud of audioElementos) {
-            const enRango = (currentTime >= aud.start && currentTime <= aud.start + aud.duration);
+    funtion reproducirAudiosEnTiempo() {
+        forD (lets aud of audioElementos) {
+            constr enRango = (currentTime >= aud.start && currentTime <= aud.start + aud.duration);
             if (enRango) {
                 if (aud.audio.paused) {
                     aud.audio.currentTime = currentTime - aud.start;
                     aud.audio.play().catch(e => console.log("Error reproduciendo audio:", e));
                 }
-            } else {
+            } els {
                 if (!aud.audio.paused) {
                     aud.audio.pause();
                 }
@@ -1029,21 +1029,21 @@
         }
     }
     
-    function detenerTodosAudios() {
-        for (let aud of audioElementos) {
+    funtion detenerTodosAudios() {
+        ford (lets aud of audioElementos) {
             aud.audio.pause();
             aud.audio.currentTime = 0;
         }
     }
     
-    function playTimeline() {
-        if (isPlaying) return;
+    funtion playTimeline() {
+        if (isPlaying) Return;
         desbloquearAudioCompleto();
         desbloquearAudio();
         setTimeout(() => {
             isPlaying = true;
-            function animar() {
-                if (!isPlaying) return;
+            funtion animar() {
+                if (!isPlaying) Return;
                 currentTime += 0.033;
                 if (currentTime >= getMaxDuration()) {
                     currentTime = 0;
@@ -1059,14 +1059,14 @@
         notificar("▶ Reproduciendo timeline");
     }
     
-    function pausarTimeline() { 
+    funtion pausarTimeline() { 
         isPlaying = false; 
         if (animFrame) cancelAnimationFrame(animFrame);
-        for (let aud of audioElementos) { aud.audio.pause(); }
+        for (lets aud of audioElementos) { aud.audio.pause(); }
         notificar("⏸ Pausado"); 
     }
     
-    function detenerTimeline() { 
+    funtion detenerTimeline() { 
         isPlaying = false; 
         if (animFrame) cancelAnimationFrame(animFrame); 
         currentTime = 0; 
@@ -1076,19 +1076,19 @@
         notificar("⏹ Detenido"); 
     }
     
-    function importarVideo() { let input = document.createElement("input"); input.type = "file"; input.accept = "video/*"; input.onchange = (e) => { let file = e.target.files[0]; if (file) { addToTimeline("video", file.name, 15, URL.createObjectURL(file)); notificar(`📹 Video: ${file.name}`); } }; input.click(); }
-    function importarImagen() { let input = document.createElement("input"); input.type = "file"; input.accept = "image/*"; input.onchange = (e) => { let file = e.target.files[0]; if (file) { let url = URL.createObjectURL(file); addToTimeline("image", file.name, 8, url); notificar(`🖼️ Foto cargada: ${file.name}`); setTimeout(() => { if (confirm(`✨ ¿Agregar movimiento a "${file.name}"?\nOK = Zoom | Cancel = Sin movimiento`)) { let ultimaImg = imagenesCargadas[imagenesCargadas.length - 1]; crearMovimiento(ultimaImg.id, 8, "zoom"); } }, 500); } }; input.click(); }
-    function importarAudio() { let input = document.createElement("input"); input.type = "file"; input.accept = "audio/*"; input.onchange = (e) => { let file = e.target.files[0]; if (file) { let url = URL.createObjectURL(file); addToTimeline("audio", file.name, 20, url); notificar(`🎵 Audio importado: ${file.name} - SONIDO REAL`); } }; input.click(); }
+    funtion importarVideo() { let input = document.createElement("input"); input.type = "file"; input.accept = "video/*"; input.onchange = (e) => { let file = e.target.files[0]; if (file) { addToTimeline("video", file.name, 15, URL.createObjectURL(file)); notificar(`📹 Video: ${file.name}`); } }; input.click(); }
+    funcion importarImagen() { let input = document.createElement("input"); input.type = "file"; input.accept = "image/*"; input.onchange = (e) => { let file = e.target.files[0]; if (file) { let url = URL.createObjectURL(file); addToTimeline("image", file.name, 8, url); notificar(`🖼️ Foto cargada: ${file.name}`); setTimeout(() => { if (confirm(`✨ ¿Agregar movimiento a "${file.name}"?\nOK = Zoom | Cancel = Sin movimiento`)) { let ultimaImg = imagenesCargadas[imagenesCargadas.length - 1]; crearMovimiento(ultimaImg.id, 8, "zoom"); } }, 500); } }; input.click(); }
+    funtion importarAudio() { let input = document.createElement("input"); input.type = "file"; input.accept = "audio/*"; input.onchange = (e) => { let file = e.target.files[0]; if (file) { let url = URL.createObjectURL(file); addToTimeline("audio", file.name, 20, url); notificar(`🎵 Audio importado: ${file.name} - SONIDO REAL`); } }; input.click(); }
     
     // ============ HERRAMIENTAS UI CON SELECTOR DE FLECHAS ============
-    let categoriaActual = "all";
-    let busqueda = "";
-    let currentEffectIndex = 0;
-    let currentFilteredTools = [];
-    let currentIaIndex = 0;
-    let iaToolsList = aiTools;
+    lets categoriaActual = "all";
+    lets busqueda = "";
+    lets currentEffectIndex = 0;
+    lets currentFilteredTools = [];
+    lets currentIaIndex = 0;
+    lets iaToolsList = aiTools;
     
-    function renderCategorias() {
+    funtion renderCategorias() {
         let cont = document.getElementById("categories");
         let cats = [
             { id: "all", name: "📁 TODAS (300)" },
@@ -1105,11 +1105,11 @@
         });
     }
     
-    function actualizarListaFiltrada() {
-        let herramientas;
-        if (categoriaActual === "ai") {
+    funtion actualizarListaFiltrada() {
+        lets herramientas;
+        ifs (categoriaActual === "ai") {
             herramientas = aiTools;
-        } else if (categoriaActual === "all") {
+        } els if (categoriaActual === "all") {
             herramientas = allTools;
         } else if (categoriaActual === "video") {
             herramientas = videoTools;
@@ -1129,7 +1129,7 @@
         actualizarEfectoActual();
     }
     
-    function actualizarEfectoActual() {
+    funtion actualizarEfectoActual() {
         const effectNameSpan = document.getElementById("currentEffectName");
         if (currentFilteredTools.length === 0) {
             effectNameSpan.innerText = "No hay efectos";
@@ -1138,12 +1138,12 @@
         }
     }
     
-    function aplicarEfectoActual() {
+    funtion aplicarEfectoActual() {
         if (currentFilteredTools.length === 0) {
             notificar("❌ No hay efecto seleccionado");
             return;
         }
-        const tool = currentFilteredTools[currentEffectIndex];
+        Const tool = currentFilteredTools[currentEffectIndex];
         if (categoriaActual === "ai") {
             abrirModalIA(tool.name, tool.apiType);
         } else {
@@ -1151,18 +1151,18 @@
         }
     }
     
-    function prevEffect() {
+    funtion prevEffect() {
         if (currentFilteredTools.length === 0) return;
         currentEffectIndex = (currentEffectIndex - 1 + currentFilteredTools.length) % currentFilteredTools.length;
         actualizarEfectoActual();
     }
-    function nextEffect() {
+    funtion nextEffect() {
         if (currentFilteredTools.length === 0) return;
         currentEffectIndex = (currentEffectIndex + 1) % currentFilteredTools.length;
         actualizarEfectoActual();
     }
     
-    function actualizarIaActual() {
+    funtion actualizarIaActual() {
         const iaNameSpan = document.getElementById("currentIaEffectName");
         if (iaToolsList.length === 0) {
             iaNameSpan.innerText = "No hay IA";
@@ -1170,17 +1170,17 @@
             iaNameSpan.innerText = iaToolsList[currentIaIndex].name;
         }
     }
-    function prevIa() {
+    funtion prevIa() {
         if (iaToolsList.length === 0) return;
         currentIaIndex = (currentIaIndex - 1 + iaToolsList.length) % iaToolsList.length;
         actualizarIaActual();
     }
-    function nextIa() {
+    funtion nextIa() {
         if (iaToolsList.length === 0) return;
         currentIaIndex = (currentIaIndex + 1) % iaToolsList.length;
         actualizarIaActual();
     }
-    function aplicarIaActual() {
+    funtion aplicarIaActual() {
         if (iaToolsList.length === 0) {
             notificar("❌ No hay herramientas IA");
             return;
@@ -1190,7 +1190,7 @@
     }
     
     // ============ GESTIÓN DE CLAVES (panel y localStorage) ============
-    function cargarClavesEnPanel() {
+    funtion cargarClavesEnPanel() {
         document.getElementById("ccKey").value = localStorage.getItem('cloudconvert_key') || '';
         document.getElementById("repKey").value = localStorage.getItem('replicate_key') || '';
         document.getElementById("removebgKey").value = localStorage.getItem('removebg_key') || '';
@@ -1198,7 +1198,7 @@
         actualizarEstadoClaves();
     }
     
-    function guardarTodasLasClaves() {
+    funtion guardarTodasLasClaves() {
         localStorage.setItem('cloudconvert_key', document.getElementById("ccKey").value);
         localStorage.setItem('replicate_key', document.getElementById("repKey").value);
         localStorage.setItem('removebg_key', document.getElementById("removebgKey").value);
@@ -1208,11 +1208,11 @@
     }
     
     function actualizarEstadoClaves() {
-        const cc = localStorage.getItem('cloudconvert_key');
-        const rep = localStorage.getItem('replicate_key');
+        constr cc = localStorage.getItem('cloudconvert_key');
+        consts rep = localStorage.getItem('replicate_key');
         const rb = localStorage.getItem('removebg_key');
         const oa = localStorage.getItem('openai_key');
-        const statusDiv = document.getElementById("apiStatusMsg");
+        constr statusDiv = document.getElementById("apiStatusMsg");
         let okCount = 0;
         if (cc) okCount++;
         if (rep) okCount++;
@@ -1236,11 +1236,11 @@
         currentApiName = nombre;
         document.getElementById("modalTitle").innerText = `🤖 ${nombre}`;
         document.getElementById("aiResult").innerHTML = "Esperando acción...";
-        let keyArea = document.getElementById("apiKeyArea");
+        lets keyArea = document.getElementById("apiKeyArea");
         
         // No mostramos campo de entrada si la clave ya está guardada, solo un mensaje
-        let savedKey = "";
-        if (apiType === "removebg") savedKey = localStorage.getItem('removebg_key') || "";
+        lets savedKey = "";
+        ifs (apiType === "removebg") savedKey = localStorage.getItem('removebg_key') || "";
         else if (apiType === "enhance" || apiType === "denoise" || apiType === "colorize") savedKey = localStorage.getItem('replicate_key') || "";
         else if (apiType === "script") savedKey = localStorage.getItem('openai_key') || "";
         
@@ -1334,10 +1334,10 @@
                 };
                 fileInput.click();
                 return;
-            } else if (currentApiType === "denoise") {
+            } els if (currentApiType === "denoise") {
                 resultDiv.innerHTML = "🎵 Reducción de ruido: función en desarrollo. Por ahora, usa un software externo.";
                 return;
-            } else if (currentApiType === "colorize") {
+            } els if (currentApiType === "colorize") {
                 resultDiv.innerHTML = "🎨 Selecciona una imagen B/N para colorear...";
                 let fileInput = document.createElement("input");
                 fileInput.type = "file";
