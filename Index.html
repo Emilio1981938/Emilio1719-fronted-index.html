@@ -1,23 +1,298 @@
-<!DOCTYPE html>
+<!lid #00ff41; }
+        .nav { display: flex; gap: 2px; background: rgba(0,0,0,0.9); padding: 6px 16px; border-bottom: 1px solid #1a1a1a; overflow-x: auto; }
+        .nav-btn { background: none; border: none; color: #888; padding: 6px 16px; font-family: monospace; font-size: 0.75rem; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+        .nav-btn:hover, .nav-btn.active { color: #00ff41; border-bottom: 2px solid #00ff41; }
+        .workspace { display: flex; flex: 1; overflow: hidden; gap: 1px; min-height: 0; }<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>EMI 1719 ULTIMATE - Editor Profesional + APIs Reales</title>
     <style>
-        /* (estilos exactamente iguales, no se modifican) */
+        /* ============ ESTILOS BASE Y MATRIX ============ */
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
-        body { background: #000000; font-family: 'Courier New', 'Share Tech Mono', monospace; color: #00ff41; height: 100vh; overflow: hidden; }
+        body { background: #000000; font-family: 'Courier New', monospace; color: #00ff41; height: 100vh; overflow: hidden; }
         .cyber-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 20% 50%, #0a0a0a 0%, #000000 100%); z-index: -1; }
+        
         .app { display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 1; }
-        .header { background: rgba(0,0,0,0.95); border-bottom: 2px solid #00ff41; padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        
+        /* Header & Stats */
+        .header { background: rgba(0,0,0,0.95); border-bottom: 2px solid #00ff41; padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 1rem; font-weight: bold; text-shadow: 0 0 5px #00ff41; }
         .logo span { color: #ff00ff; }
         .stats { display: flex; gap: 12px; font-size: 0.65rem; background: rgba(0,255,65,0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid #00ff41; }
+
+        /* Navigation */
         .nav { display: flex; gap: 2px; background: rgba(0,0,0,0.9); padding: 6px 16px; border-bottom: 1px solid #1a1a1a; overflow-x: auto; }
-        .nav-btn { background: none; border: none; color: #888; padding: 6px 16px; font-family: monospace; font-size: 0.75rem; cursor: pointer; transition: 0.2s; white-space: nowrap; }
-        .nav-btn:hover, .nav-btn.active { color: #00ff41; border-bottom: 2px solid #00ff41; }
-        .workspace { display: flex; flex: 1; overflow: hidden; gap: 1px; min-height: 0; }
+        .nav-btn { background: none; border: none; color: #888; padding: 6px 16px; font-family: monospace; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
+        .nav-btn.active { color: #00ff41; border-bottom: 2px solid #00ff41; }
+
+        /* Workspace Panels */
+        .workspace { display: flex; flex: 1; overflow: hidden; gap: 1px; }
+        .tools-panel { width: 280px; background: rgba(5,5,5,0.95); border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; }
+        
+        /* API Config Box */
+        .api-config { border: 1px solid #00ff41; border-radius: 8px; padding: 10px; margin: 10px; background: #0a0a0a; }
+        .api-config h4 { color: #ff00ff; font-size: 0.7rem; margin-bottom: 8px; text-align: center; }
+        .api-config input { width: 100%; background: #111; border: 1px solid #00ff41; color: #00ff41; padding: 5px; font-size: 0.6rem; margin-bottom: 6px; border-radius: 4px; }
+        .api-config button { background: #00aaff20; border: 1px solid #00aaff; color: #00aaff; padding: 4px 8px; font-size: 0.6rem; border-radius: 15px; cursor: pointer; width: 100%; }
+
+        /* Effect Selector Matrix Style */
+        .effect-selector { background: #0a0a0a; border: 1px solid #00ff41; border-radius: 8px; padding: 10px; margin: 10px; text-align: center; }
+        .effect-name { font-size: 0.8rem; font-weight: bold; color: #00ff41; background: #000; padding: 6px; border-radius: 5px; margin: 6px 0; border: 1px solid #333; }
+        .effect-nav { display: flex; justify-content: center; gap: 12px; margin: 8px 0; }
+        .nav-arrow { background: #111; border: 1px solid #00ff41; color: #00ff41; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; }
+        
+        /* Preview Area */
+        .preview-panel { flex: 1; display: flex; flex-direction: column; background: #000; }
+        .preview-area { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; border: 1px solid #1a1a1a; margin: 8px; border-radius: 10px; background: #050505; }
+        #mainCanvas { max-width: 100%; max-height: 100%; object-fit: contain; }
+        
+        /* Timeline */
+        .timeline-container { height: 35vh; background: #050505; border-top: 2px solid #00ff41; position: relative; overflow: hidden; }
+        .track { display: flex; height: 50px; border-bottom: 1px solid #1a1a1a; position: relative; }
+        .track-label { width: 80px; background: #000; border-right: 1px solid #1a1a1a; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .track-clips { flex: 1; position: relative; }
+        .playhead { position: absolute; width: 2px; height: 100%; background: #ff00ff; z-index: 20; pointer-events: none; box-shadow: 0 0 10px #ff00ff; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: #000; border: 1px solid #00ff41; padding: 20px; width: 80%; max-width: 400px; text-align: center; }
+
+        @keyframes fadeOut { 0% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; transform: translateY(-20px); } }
+    </style>
+</head>
+<body>
+
+<div class="cyber-bg"></div>
+
+<div class="app">
+    <div class="header">
+        <div class="logo">🎬 EMI 1719 <span>ULTIMATE</span></div>
+        <div class="stats">
+            <span>📹 <span id="videoCount">0</span></span>
+            <span>🎵 <span id="audioCount">0</span></span>
+            <span>🖼️ <span id="imageCount">0</span></span>
+        </div>
+    </div>
+
+    <div class="nav">
+        <button class="nav-btn active">EDITOR</button>
+        <button class="nav-btn">AI STUDIO</button>
+        <button class="nav-btn">EXPORTAR</button>
+    </div>
+
+    <div class="workspace">
+        <div class="tools-panel">
+            <div class="api-config">
+                <h4>🔑 API KEYS</h4>
+                <input type="password" id="ccKey" placeholder="CloudConvert Key">
+                <input type="password" id="repKey" placeholder="Replicate Token">
+                <input type="password" id="removebgKey" placeholder="Remove.bg Key">
+                <input type="password" id="openaiKey" placeholder="OpenAI Key">
+                <button id="saveAllKeysBtn">💾 GUARDAR LOCALMENTE</button>
+                <div id="apiStatusMsg" class="api-status">Esperando...</div>
+            </div>
+
+            <div class="effect-selector">
+                <input type="text" id="searchTools" placeholder="Buscar efecto..." style="width:100%; background:#111; color:#00ff41; border:1px solid #333; margin-bottom:5px; padding:3px;">
+                <div class="effect-name" id="currentEffectName">Cargando...</div>
+                <div class="effect-nav">
+                    <button id="prevEffectBtn" class="nav-arrow">◀</button>
+                    <button id="nextEffectBtn" class="nav-arrow">▶</button>
+                </div>
+                <button id="applyEffectBtn" style="color:#ff00ff; border:1px solid #ff00ff; background:none; padding:4px 10px; cursor:pointer; font-size:0.7rem;">APLICAR EFECTO</button>
+            </div>
+
+            <div class="effect-selector">
+                <div class="effect-name" id="currentIaEffectName">IA: Remover Fondo</div>
+                <div class="effect-nav">
+                    <button id="prevIaBtn" class="nav-arrow">◀</button>
+                    <button id="nextIaBtn" class="nav-arrow">▶</button>
+                </div>
+                <button id="applyIaBtn" style="color:#00aaff; border:1px solid #00aaff; background:none; padding:4px 10px; cursor:pointer; font-size:0.7rem;">EJECUTAR IA</button>
+            </div>
+        </div>
+
+        <div class="preview-panel">
+            <div class="preview-area">
+                <canvas id="mainCanvas" width="800" height="450"></canvas>
+            </div>
+            <div style="padding:10px; display:flex; gap:10px; justify-content:center; border-top:1px solid #1a1a1a;">
+                <button id="playBtn" class="nav-btn">▶ PLAY</button>
+                <button id="pauseBtn" class="nav-btn">⏸ PAUSE</button>
+                <button id="importImageBtn" class="nav-btn">🖼️ IMPORTAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="timeline-container">
+        <div id="playhead" class="playhead"></div>
+        <div class="track"><div class="track-label">VIDEO</div><div class="track-clips" id="videoTrack"></div></div>
+        <div class="track"><div class="track-label">AUDIO</div><div class="track-clips" id="audioTrack"></div></div>
+        <div class="track"><div class="track-label">FOTOS</div><div class="track-clips" id="imageTrack"></div></div>
+    </div>
+</div>
+
+<div id="aiModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">PROCESANDO</h3>
+        <p id="aiResult" style="font-size:0.7rem; margin:15px 0;"></p>
+        <button id="closeAiModal" class="nav-btn" style="border:1px solid #ff0041;">CERRAR</button>
+    </div>
+</div>
+
+<script>
+    // ============ DATOS Y VARIABLES ============
+    let currentEffectIndex = 0;
+    let currentIaIndex = 0;
+    let currentFilteredTools = [];
+    let zoom = 20;
+    let timeline = { video: [], audio: [], image: [] };
+
+    const iaToolsList = [
+        { name: "🧠 REMOVER FONDO", desc: "IA de segmentación", apiType: "remove.bg" },
+        { name: "✨ UPSCALE 4K", desc: "Mejora de resolución", apiType: "replicate" },
+        { name: "🎨 COLOREAR", desc: "IA para fotos B/N", apiType: "replicate" },
+        { name: "📝 SUBTÍTULOS", desc: "Whisper Transcription", apiType: "openai" }
+    ];
+
+    const allTools = [
+        { name: "Corte Glitch", category: "all" },
+        { name: "Zoom Matrix", category: "all" },
+        { name: "Neon Glow", category: "all" },
+        { name: "VHS Distortion", category: "all" },
+        { name: "Color Burn", category: "all" }
+    ];
+
+    // ============ LÓGICA DE NAVEGACIÓN ============
+    function actualizarFiltros() {
+        const busqueda = document.getElementById("searchTools").value.toLowerCase();
+        currentFilteredTools = allTools.filter(t => t.name.toLowerCase().includes(busqueda));
+        currentEffectIndex = 0;
+        mostrarEfectoActual();
+    }
+
+    function mostrarEfectoActual() {
+        const el = document.getElementById("currentEffectName");
+        if (currentFilteredTools.length > 0) {
+            el.textContent = currentFilteredTools[currentEffectIndex].name;
+            el.style.color = "#00ff41";
+        } else {
+            el.textContent = "Sin resultados";
+            el.style.color = "#ff0000";
+        }
+    }
+
+    function mostrarIaActual() {
+        const el = document.getElementById("currentIaEffectName");
+        el.textContent = iaToolsList[currentIaIndex].name;
+    }
+
+    // ============ GESTIÓN DE API KEYS ============
+    function guardarKeys() {
+        const keys = {
+            cc: document.getElementById("ccKey").value,
+            rep: document.getElementById("repKey").value,
+            rbg: document.getElementById("removebgKey").value,
+            gpt: document.getElementById("openaiKey").value
+        };
+        localStorage.setItem("emi_api_keys", JSON.stringify(keys));
+        const status = document.getElementById("apiStatusMsg");
+        status.textContent = "✅ Claves Guardadas";
+        status.style.color = "#00ff41";
+        notificar("🔐 API Keys actualizadas");
+    }
+
+    function cargarKeys() {
+        const saved = localStorage.getItem("emi_api_keys");
+        if (saved) {
+            const keys = JSON.parse(saved);
+            document.getElementById("ccKey").value = keys.cc || "";
+            document.getElementById("repKey").value = keys.rep || "";
+            document.getElementById("removebgKey").value = keys.rbg || "";
+            document.getElementById("openaiKey").value = keys.gpt || "";
+            document.getElementById("apiStatusMsg").textContent = "✅ Claves cargadas";
+        }
+    }
+
+    // ============ SISTEMA DE NOTIFICACIONES ============
+    function notificar(msg) {
+        const toast = document.createElement("div");
+        toast.style = `position:fixed; top:20px; right:20px; background:#000; border:1px solid #00ff41; 
+                       color:#00ff41; padding:10px 20px; z-index:9999; font-family:monospace; 
+                       box-shadow:0 0 10px #00ff41; animation: fadeOut 3s forwards;`;
+        toast.textContent = `> ${msg}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function actualizarContadores() {
+        document.getElementById("videoCount").textContent = timeline.video.length;
+        document.getElementById("audioCount").textContent = timeline.audio.length;
+        document.getElementById("imageCount").textContent = timeline.image.length;
+    }
+
+    // ============ EVENT LISTENERS ============
+    document.addEventListener("DOMContentLoaded", () => {
+        cargarKeys();
+        actualizarFiltros();
+        mostrarIaActual();
+
+        // Navegación Efectos
+        document.getElementById("nextEffectBtn").onclick = () => {
+            currentEffectIndex = (currentEffectIndex + 1) % currentFilteredTools.length;
+            mostrarEfectoActual();
+        };
+        document.getElementById("prevEffectBtn").onclick = () => {
+            currentEffectIndex = (currentEffectIndex - 1 + currentFilteredTools.length) % currentFilteredTools.length;
+            mostrarEfectoActual();
+        };
+
+        // Navegación IA
+        document.getElementById("nextIaBtn").onclick = () => {
+            currentIaIndex = (currentIaIndex + 1) % iaToolsList.length;
+            mostrarIaActual();
+        };
+        document.getElementById("prevIaBtn").onclick = () => {
+            currentIaIndex = (currentIaIndex - 1 + iaToolsList.length) % iaToolsList.length;
+            mostrarIaActual();
+        };
+
+        // Acciones
+        document.getElementById("saveAllKeysBtn").onclick = guardarKeys;
+        document.getElementById("searchTools").oninput = actualizarFiltros;
+
+        document.getElementById("applyEffectBtn").onclick = () => {
+            const efecto = currentFilteredTools[currentEffectIndex];
+            if (efecto) notificar(`Aplicando ${efecto.name}...`);
+        };
+
+        document.getElementById("applyIaBtn").onclick = () => {
+            const ia = iaToolsList[currentIaIndex];
+            document.getElementById("modalTitle").textContent = ia.name;
+            document.getElementById("aiResult").textContent = `Iniciando proceso... Requiere API Key de ${ia.apiType}.`;
+            document.getElementById("aiModal").classList.add("show");
+        };
+
+        document.getElementById("closeAiModal").onclick = () => {
+            document.getElementById("aiModal").classList.remove("show");
+        };
+        
+        // Simulación de importación
+        document.getElementById("importImageBtn").onclick = () => {
+            const name = prompt("Nombre de la imagen:");
+            if(name) {
+                timeline.image.push({name});
+                actualizarContadores();
+                notificar("Imagen añadida");
+            }
+        };
+    });
+</script>
+</body>
+</html>
         .tools-panel { width: 280px; background: rgba(5,5,5,0.95); border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; flex-shrink: 0; }
         .tools-search { padding: 8px; border-bottom: 1px solid #1a1a1a; }
         .tools-search input { width: 100%; background: #0a0a0a; border: 1px solid #00ff41; color: #00ff41; padding: 6px; font-family: monospace; border-radius: 5px; font-size: 0.7rem; }
