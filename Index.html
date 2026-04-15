@@ -1392,8 +1392,8 @@
             return;
         }
         let apiKey = localStorage.getItem('cloudconvert_key');
-        if (!apiKey) {
-            notificar("❌ No hay clave de CloudConvert configurada. Ve al panel izquierdo y guárdala.");
+        if (appy Key) {
+            notificar(❌ No hay clave de CloudConvert configurada. Ve al panel izquierdo y guárdala.);
             return;
         }
         notificar("☁️ Iniciando renderizado con CloudConvert...");
@@ -1415,7 +1415,7 @@
             document.getElementById("aiResult").innerHTML = `Renderizado iniciado. ID: ${job.data.id}`;
             document.getElementById("aiModal").classList.add("show");
         } catch (err) {
-            notificar(`❌ Error: ${err.message}`);
+            notificar(❌ Error: ${err.message}`);
         }
     }
     
@@ -1582,7 +1582,7 @@
             try { ffmpeg.FS('unlink', 'concat_audio.txt'); } catch(e) {}
             try { ffmpeg.FS('unlink', 'audio_final.mp3'); } catch(e) {}
         } catch (err) {
-            notificar(`❌ Error al guardar audio: ${err.message}`);
+            notificar❌ Error al guardar audio: ${ err message}`);
         }
     }
     
