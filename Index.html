@@ -1,591 +1,57 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>EMI 1719 - SISTEMA RESTAURADO</title>
     <style>
-        /* CSS REFORZADO PARA EVITAR COMPRESIÓN */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; }
-        body { background: #000; color: #00ff41; height: 100 vh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        .header { background: #000; border-bottom: 2 px solid #00ff41; padding: 10 px 20 px; display: flex; justify-content: space-between; align-items: center; height: 60px; }
-        .logo { font-weight: bold; font-size: 1.2 rem; text-shadow: 0 0 10 px #00ff41; }
-        .logo span { color: #ff00ff; }
+        body { background: #000; color: #00ff41; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* Contenedor principal con Scroll si es necesario */
-        .main-container { display: flex; flex: 1; overflow: hidden; background: #050505; }
-
-        /* Panel lateral ancho para que quepan las 300 funciones */
-        .side-panel { width: 320 px; border-right: 1 px solid #00ff41; display: flex; flex-direction: column; background: #000; overflow-y: auto; padding: 15px; }
-        
-        .card { border: 1 px solid #333; border-radius: 8 px; padding: 15 px; margin-bottom: 20 px; background: #0a0a0a; border-left: 4 px solid #00ff41; }
-        .card h4 { font-size: 0.8 rem; color: #ff00ff; margin-bottom: 12 px; text-transform: uppercase; letter-spacing: 1 px; }
-
-        /* Botones estilo Matrix */
-        button { cursor: pointer; border-radius: 4 px; transition: 0.2 s; font-weight: bold; border: 1px solid #00ff41; background: #000; color: #00ff41; padding: 8px; margin: 4px 0; width: 100%; }
-        button:hover { background: #00ff41; color: #000; box-shadow: 0 0 15 px #00ff41; }
-        .btn-ia { border-color: #00aaff; color: #00aaff; }
-        .btn-ia:hover { background: #00aaff; color: #fff; }
-
-        /* Área de visualización */
-        .preview-panel { flex: 1; display: flex; flex-direction: column; background: #000; }
-        .canvas-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20 px; position: relative; }
-        canvas { width: 100 %; max-width: 800 px; aspect-ratio: 16/9; border: 2 px solid #222; background: #000; box-shadow: 0 0 30 px rgba (0,255,65,0.1); }
-
-        /* Toolbar de Control */
-        .media-toolbar { background: #0a0a0a; border-top: 1 px solid #00ff41; padding: 15 px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .btn-tool { width: auto; padding: 8 px 20 px; font-size: 0.75 rem; }
-
-        /* Timeline Expandida */
-        .timeline-box { height: 280px; background: #000; border-top: 2px solid #00ff41; overflow-y: auto; }
-        .track { display: flex; height: 60px; border-bottom: 1px solid #1a1a1a; position: relative; min-width: 5000px; }
-        .track-label { width: 120px; background: #050505; border-right: 1px solid #00ff41; display: flex; align-items: center; padding-left: 10px; font-size: 0.7rem; position: sticky; left: 0; z-index: 10; color: #00ff41; font-weight: bold; }
-        
-        .clip { position: absolute; height: 45px; top: 7px; background: rgba(0,255,65,0.2); border: 1px solid #00ff41; border-radius: 4px; color: #fff; display: flex; align-items: center; padding: 0 10px; font-size: 0.65rem; }
-        .playhead { position: absolute; top: 0; left: 120px; width: 2px; height: 100%; background: #ff00ff; z-index: 20; pointer-events: none; box-shadow: 0 0 10px #ff00ff; }
-
-        /* Scrollers */
-        ::-webkit-scrollbar { width: 6 px; height: 6 px; }
-        ::-webkit-scrollbar-thumb { background: #00ff41; border-radius: 10 px; }
-    </style>
-</head>
-<body>
-
-<div class="header">
-    <div class="logo">🎬 EMI 1719 <span>ULTIMATE</span> | SISTEMA UNIFICADO</div>
-    <div id="connectionStatus" style="font-size: 0.7 rem; color: #ff00ff;">● CONECTADO A VERCEL PROXY</div>
-</div>
-
-<div class="main-container">
-    <div class="side-panel">
-        <div class="card">
-            <h4>🔑 MOTOR DE LLAVES (AUTO)</h4>
-            <p style="font-size: 0.6 rem; color: #888; margin-bottom: 10px;">Las variables de entorno están activas en el Proxy.</p>
-            <button onclick="checkConnections()">VERIFICAR APIS</button>
-        </div>
-
-        <div class="card">
-            <h4>🤖 IA STUDIO (6 NÚCLEOS)</h4>
-            <select id="iaSelect" style="width:100 %; background:#000; color:#00ff41; border:1px solid #00ff41; padding:5px; margin-bottom:10px;">
-                <option value="replicate">REPLICATE (Video Gen)</option>
-                <option value="cloudconvert">CLOUDCONVERT (Render)</option>
-                <option value="removebg">REMOVE.BG (Fondo)</option>
-                <option value="openai">OPENAI (GPT-4 Script)</option>
-                <option value="elevenlabs">ELEVENLABS (Voz)</option>
-                <option value="stablediffusion">STABLE DIFFUSION (Imagen)</option>
-            </select>
-            <button class="btn-ia" onclick="ejecutarIA()">PROCESAR CON IA</button>
-        </div>
-
-        <div class="card">
-            <h4>🎭 EFECTOS Y FILTROS</h4>
-            <button onclick="aplicarFiltro('glitch')">GLITCH DIGITAL</button>
-            <button onclick="aplicarFiltro('matrix')">MATRIX RAIN</button>
-            <button onclick="aplicarFiltro('vhs')">VHS RETRO</button>
-            <button onclick="aplicarFiltro('neon')">NEON GLOW</button>
-        </div>
-    </div>
-
-    <div class="preview-panel">
-        <div class="canvas-container">
-            <canvas id="mainCanvas" width="1280" height="720"></canvas>
-            <div id="timer" style="margin-top:10px; color:#00ff41; font-family:monospace;">00:00:00:00</div>
-        </div>
-
-        <div class="media-toolbar">
-            <button class="btn-tool" onclick="togglePlay()">▶ PLAY</button>
-            <button class="btn-tool" onclick="stopVideo()">⏹ STOP</button>
-            <button class="btn-tool" onclick="document.getElementById('fileInput').click()">📁 IMPORTAR MEDIA</button>
-            <button class="btn-tool" style="border-color:#ff00ff; color:#ff00ff;" onclick="renderFinal()">📤 RENDER FINAL</button>
-        </div>
-        <input type="file" id="fileInput" hidden multiple onchange="manejarArchivos(this.files)">
-    </div>
-</div>
-
-<div class="timeline-box">
-    <div id="playhead" class="playhead"></div>
-    <div class="track"><div class="track-label">VIDEO / IA</div><div id="vTrack"></div></div>
-    <div class="track"><div class="track-label">FOTOS</div><div id="iTrack"></div></div>
-    <div class="track"><div class="track-label">AUDIO / VOZ</div><div id="aTrack"></div></div>
-</div>
-
-<script>
-    // RUTAS DE TUS 6 REPOSITORIOS / PROXYS
-     constr PROXY _ REPOS = {
-        replicate: '/api/replicate',
-        cloudconvert: '/api/render',
-        removebg: '/api/removebg',
-        openai: '/api/gpt',
-        elevenlabs: '/api/voice',
-        stablediffusion: '/api/sd'
-    };
-
-    l et time = 0;
-    l et isPlaying = false;
-    l et clips = { video: [], image: [], audio: [] };
-
-    // FUNCIÓN PARA QUE NO SE PIERDAN LAS LLAMADAS A LA API
-    a sync funcion ejecutarIA() {
-        consts iaSeleccionada = document.getElementById('iaSelect').value;
-        consts endpoint = PROXY_REPOS[iaSeleccionada];
-        
-        notificar(`Iniciando conexión con ${iaSeleccionada}...`)
-        
-         tri
-            constr response = awai  fetch(endpoint, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ 
-                    clips: clips,
-                    action: "process" 
-                })
-            });
-            constr data = awai  response.json();
-            notificar("IA: Respuesta recibida del Proxy.");
-        } catche) {
-            notificar(`Error: Proxy ${iaSeleccionada} no responde.`);
-        }
-    }
-
-    funtion manejarArchivos(files) {
-        Array.from(files).forEach(file => {
-            constr url = URL.createObjectURL(file);
-            constr tipo = file.type.split('/')[0];
-            constr target = tipo === 'image' ? 'image' : (tipo === 'audio' ? 'audio' : 'video');
-            
-            clips[target].push({
-                name: file.name,
-                url: url,
-                start: time
-            });
-            notificar(`Cargado: ${file.name}`);
-        });
-        actualizarTimeline();
-    }
-
-    funtion actualizarTimeline() {
-        consts tracks = { video: 'vTrack', image: 'iTrack', audio: 'aTrack' };
-        ford lets tin tracks {
-            consts container = document.getElementById(tracks[t]);
-            container.innerHTML = "";
-            clips[t].forEach(c => {
-                constr div = document.createElement('div');
-                div.className = 'clip';
-                div.style.left = (c.start * 15) + "px";
-                div.style.width = "180px";
-                div.textContent = c.name;
-                container.appendChild(div);
-            });
-        }
-    }
-
-    funtion togglePlay() {
-        isPlaying = !isPlaying;
-        if (isPlaying) loop();
-    }
-
-    funtion loop() {
-        if (!isPlaying) return;
-        time += 0.1;
-        document.getElementById("playhead").style.left = (120 + time * 15) + "px";
-        dibujarPreview();
-        requestAnimationFrame(loop);
-    }
-
-    funtion dibujarPreview() {
-        constr canvas = document.getElementById("mainCanvas");
-        constr ctx = canvas.getContext("2d");
-        ctx.fillStyle = "#000";
-        ctx.fillRect(0,0, canvas.width, canvas.height);
-
-        // Lógica de visualización de fotos/video
-        ifs (clips.image.length > 0) {
-            constr img  New Image();
-            img.src = clips.image[clips.image.length-1].url;
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        }
-    }
-
-    funtion notificar(msg) {
-        console.log(msg);
-        constr st = document.getElementById("connectionStatus");
-        st.textContent = `● ${msg.toUpperCase()}`;
-        setTimeout(() => st.textContent = `● CONECTADO A VERCEL PROXY`, 4000);
-    }
-</script>
-</body>
-</html>        .header { background: rgba(0,0,0,0.95); border-bottom: 2px solid #00ff41; padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; }
+        .header { background: rgba(0,0,0,0.95); border-bottom: 2px solid #00ff41; padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 1rem; font-weight: bold; text-shadow: 0 0 5px #00ff41; }
         .logo span { color: #ff00ff; }
         .stats { display: flex; gap: 12px; font-size: 0.65rem; background: rgba(0,255,65,0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid #00ff41; }
 
-        /* Navigation */
         .nav { display: flex; gap: 2px; background: rgba(0,0,0,0.9); padding: 6px 16px; border-bottom: 1px solid #1a1a1a; overflow-x: auto; }
         .nav-btn { background: none; border: none; color: #888; padding: 6px 16px; font-family: monospace; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
         .nav-btn.active { color: #00ff41; border-bottom: 2px solid #00ff41; }
 
-        /* Workspace Panels */
         .workspace { display: flex; flex: 1; overflow: hidden; gap: 1px; }
         .tools-panel { width: 280px; background: rgba(5,5,5,0.95); border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; }
-        
-        /* API Config Box */
-        .api-config { border: 1px solid #00ff41; border-radius: 8px; padding: 10px; margin: 10px; background: #0a0a0a; }
-        .api-config h4 { color: #ff00ff; font-size: 0.7rem; margin-bottom: 8px; text-align: center; }
-        .api-config input { width: 100%; background: #111; border: 1px solid #00ff41; color: #00ff41; padding: 5px; font-size: 0.6rem; margin-bottom: 6px; border-radius: 4px; }
-        .api-config button { background: #00aaff20; border: 1px solid #00aaff; color: #00aaff; padding: 4px 8px; font-size: 0.6rem; border-radius: 15px; cursor: pointer; width: 100%; }
 
-        /* Effect Selector Matrix Style */
-        .effect-selector { background: #0a0a0a; border: 1px solid #00ff41; border-radius: 8px; padding: 10px; margin: 10px; text-align: center; }
-        .effect-name { font-size: 0.8rem; font-weight: bold; color: #00ff41; background: #000; padding: 6px; border-radius: 5px; margin: 6px 0; border: 1px solid #333; }
-        .effect-nav { display: flex; justify-content: center; gap: 12px; margin: 8px 0; }
-        .nav-arrow { background: #111; border: 1px solid #00ff41; color: #00ff41; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; }
-        
-        /* Preview Area */
-        .preview-panel { flex: 1; display: flex; flex-direction: column; background: #000; }
-        .preview-area { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; border: 1px solid #1a1a1a; margin: 8px; border-radius: 10px; background: #050505; }
-        #mainCanvas { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
-        /* Timeline */
-        .timeline-container { height: 35vh; background: #050505; border-top: 2px solid #00ff41; position: relative; overflow: hidden; }
-        .track { display: flex; height: 50px; border-bottom: 1px solid #1a1a1a; position: relative; }
-        .track-label { width: 80px; background: #000; border-right: 1px solid #1a1a1a; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; z-index: 10; }
-        .track-clips { flex: 1; position: relative; }
-        .playhead { position: absolute; width: 2px; height: 100%; background: #ff00ff; z-index: 20; pointer-events: none; box-shadow: 0 0 10px #ff00ff; }
-
-        /* Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
-        .modal.show { display: flex; }
-        .modal-content { background: #000; border: 1px solid #00ff41; padding: 20px; width: 80%; max-width: 400px; text-align: center; }
-
-        @keyframes fadeOut { 0% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; transform: translateY(-20px); } }
-    </style>
-</head>
-<body>
-
-<div class="cyber-bg"></div>
-
-<div class="app">
-    <div class="header">
-        <div class="logo">🎬 EMI 1719 <span>ULTIMATE</span></div>
-        <div class="stats">
-            <span>📹 <span id="videoCount">0</span></span>
-            <span>🎵 <span id="audioCount">0</span></span>
-            <span>🖼️ <span id="imageCount">0</span></span>
-        </div>
-    </div>
-
-    <div class="nav">
-        <button class="nav-btn active">EDITOR</button>
-        <button class="nav-btn">AI STUDIO</button>
-        <button class="nav-btn">EXPORTAR</button>
-    </div>
-
-    <div class="workspace">
-        <div class="tools-panel">
-            <div class="api-config">
-                <h4>🔑 API KEYS</h4>
-                <input type="password" id="ccKey" placeholder="CloudConvert Key">
-                <input type="password" id="repKey" placeholder="Replicate Token">
-                <input type="password" id="removebgKey" placeholder="Remove.bg Key">
-                <input type="password" id="openaiKey" placeholder="OpenAI Key">
-                <button id="saveAllKeysBtn">💾 GUARDAR LOCALMENTE</button>
-                <div id="apiStatusMsg" class="api-status">Esperando...</div>
-            </div>
-
-            <div class="effect-selector">
-                <input type="text" id="searchTools" placeholder="Buscar efecto..." style="width:100%; background:#111; color:#00ff41; border:1px solid #333; margin-bottom:5px; padding:3px;">
-                <div class="effect-name" id="currentEffectName">Cargando...</div>
-                <div class="effect-nav">
-                    <button id="prevEffectBtn" class="nav-arrow">◀</button>
-                    <button id="nextEffectBtn" class="nav-arrow">▶</button>
-                </div>
-                <button id="applyEffectBtn" style="color:#ff00ff; border:1px solid #ff00ff; background:none; padding:4px 10px; cursor:pointer; font-size:0.7rem;">APLICAR EFECTO</button>
-            </div>
-
-            <div class="effect-selector">
-                <div class="effect-name" id="currentIaEffectName">IA: Remover Fondo</div>
-                <div class="effect-nav">
-                    <button id="prevIaBtn" class="nav-arrow">◀</button>
-                    <button id="nextIaBtn" class="nav-arrow">▶</button>
-                </div>
-                <button id="applyIaBtn" style="color:#00aaff; border:1px solid #00aaff; background:none; padding:4px 10px; cursor:pointer; font-size:0.7rem;">EJECUTAR IA</button>
-            </div>
-        </div>
-
-        <div class="preview-panel">
-            <div class="preview-area">
-                <canvas id="mainCanvas" width="800" height="450"></canvas>
-            </div>
-            <div style="padding:10px; display:flex; gap:10px; justify-content:center; border-top:1px solid #1a1a1a;">
-                <button id="playBtn" class="nav-btn">▶ PLAY</button>
-                <button id="pauseBtn" class="nav-btn">⏸ PAUSE</button>
-                <button id="importImageBtn" class="nav-btn">🖼️ IMPORTAR</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="timeline-container">
-        <div id="playhead" class="playhead"></div>
-        <div class="track"><div class="track-label">VIDEO</div><div class="track-clips" id="videoTrack"></div></div>
-        <div class="track"><div class="track-label">AUDIO</div><div class="track-clips" id="audioTrack"></div></div>
-        <div class="track"><div class="track-label">FOTOS</div><div class="track-clips" id="imageTrack"></div></div>
-    </div>
-</div>
-
-<div id="aiModal" class="modal">
-    <div class="modal-content">
-        <h3 id="modalTitle">PROCESANDO</h3>
-        <p id="aiResult" style="font-size:0.7rem; margin:15px 0;"></p>
-        <button id="closeAiModal" class="nav-btn" style="border:1px solid #ff0041;">CERRAR</button>
-    </div>
-</div>
-
-<script>
-    // ============ DATOS Y VARIABLES ============
-    l et currentEffectIndex = 0;
-    l et currentIaIndex = 0;
-    l et currentFilteredTools = [];
-    l et zoom = 20;
-    l et timeline = { video: [], audio: [], image: [] };
-
-    constr iaToolsList = [
-        { name: "🧠 REMOVER FONDO", desc: "IA de segmentación", apiType: "remove.bg" },
-        { name: "✨ UPSCALE 4K", desc: "Mejora de resolución", apiType: "replicate" },
-        { name: "🎨 COLOREAR", desc: "IA para fotos B/N", apiType: "replicate" },
-        { name: "📝 SUBTÍTULOS", desc: "Whisper Transcription", apiType: "openai" }
-    ];
-
-    const allTools = [
-        { name: "Corte Glitch", category: "all" },
-        { name: "Zoom Matrix", category: "all" },
-        { name: "Neon Glow", category: "all" },
-        { name: "VHS Distortion", category: "all" },
-        { name: "Color Burn", category: "all" }
-    ];
-
-    // ============ LÓGICA DE NAVEGACIÓN ============
-    funtion actualizarFiltros() {
-        constr busqueda = document.getElementById("searchTools").value.toLowerCase();
-        currentFilteredTools = allTools.filter(t => t.name.toLowerCase().includes(busqueda));
-        currentEffectIndex = 0;
-        mostrarEfectoActual();
-    }
-
-    funtion mostrarEfectoActual() {
-        constr el = document.getElementById("currentEffectName");
-        if (currentFilteredTools.length > 0) {
-            el.textContent = currentFilteredTools[currentEffectIndex].name;
-            el.style.color = "#00ff41";
-        } els {
-            el.textContent = "Sin resultados";
-            el.style.color = "#ff0000";
-        }
-    }
-
-    funtion mostrarIaActual() {
-        constr el = document.getElementById("currentIaEffectName");
-        el.textContent = iaToolsList[currentIaIndex].name;
-    }
-
-    // ============ GESTIÓN DE API KEYS ============
-    funtion guardarKeys() {
-        constr keys = {
-            cc: document.getElementById("ccKey").value,
-            rep: document.getElementById("repKey").value,
-            rbg: document.getElementById("removebgKey").value,
-            gpt: document.getElementById("openaiKey").value
-        };
-        localStorage.setItem("emi_api_keys", JSON.stringify(keys));
-        constr status = document.getElementById("apiStatusMsg");
-        status.textContent = "✅ Claves Guardadas";
-        status.style.color = "#00ff41";
-        notificar("🔐 API Keys actualizadas");
-    }
-
-    funtion cargarKeys() {
-        constr saved = localStorage.getItem("emi_api_keys");
-        if (saved) {
-            constr keys = JSON.parse(saved);
-            document.getElementById("ccKey").value = keys.cc || "";
-            document.getElementById("repKey").value = keys.rep || "";
-            document.getElementById("removebgKey").value = keys.rbg || "";
-            document.getElementById("openaiKey").value = keys.gpt || "";
-            document.getElementById("apiStatusMsg").textContent = "✅ Claves cargadas";
-        }
-    }
-
-    // ============ SISTEMA DE NOTIFICACIONES ============
-    funtion notificar(msg) {
-        constr toast = document.createElement("div");
-        toast.style = `position:fixed; top:20px; right:20px; background:#000; border:1px solid #00ff41; 
-                       color:#00ff41; padding:10px 20px; z-index:9999; font-family:monospace; 
-                       box-shadow:0 0 10px #00ff41; animation: fadeOut 3s forwards;`;
-        toast.textContent = `> ${msg}`;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-
-    funtion actualizarContadores() {
-        document.getElementById("videoCount").textContent = timeline.video.length;
-        document.getElementById("audioCount").textContent = timeline.audio.length;
-        document.getElementById("imageCount").textContent = timeline.image.length;
-    }
-
-    // ============ EVENT LISTENERS ============
-    document.addEventListener("DOMContentLoaded", () => {
-        cargarKeys();
-        actualizarFiltros();
-        mostrarIaActual();
-
-        // Navegación Efectos
-        document.getElementById("nextEffectBtn").onclick = () => {
-            currentEffectIndex = (currentEffectIndex + 1) % currentFilteredTools.length;
-            mostrarEfectoActual();
-        };
-        document.getElementById("prevEffectBtn").onclick = () => {
-            currentEffectIndex = (currentEffectIndex - 1 + currentFilteredTools.length) % currentFilteredTools.length;
-            mostrarEfectoActual();
-        };
-
-        // Navegación IA
-        document.getElementById("nextIaBtn").onclick = () => {
-            currentIaIndex = (currentIaIndex + 1) % iaToolsList.length;
-            mostrarIaActual();
-        };
-        document.getElementById("prevIaBtn").onclick = () => {
-            currentIaIndex = (currentIaIndex - 1 + iaToolsList.length) % iaToolsList.length;
-            mostrarIaActual();
-        };
-
-        // Acciones
-        document.getElementById("saveAllKeysBtn").onclick = guardarKeys;
-        document.getElementById("searchTools").oninput = actualizarFiltros;
-
-        document.getElementById("applyEffectBtn").onclick = () => {
-            constr efecto = currentFilteredTools[currentEffectIndex];
-            if (efecto) notificar(`Aplicando ${efecto.name}...`);
-        };
-
-        document.getElementById("applyIaBtn").onclick = () => {
-            constr ia = iaToolsList[currentIaIndex];
-            document.getElementById("modalTitle").textContent = ia.name;
-            document.getElementById("aiResult").textContent = `Iniciando proceso... Requiere API Key de ${ia.apiType}.`;
-            document.getElementById("aiModal").classList.add("show");
-        };
-
-        document.getElementById("closeAiModal").onclick = () => {
-            document.getElementById("aiModal").classList.remove("show");
-        };
-        
-        // Simulación de importación
-        document.getElementById("importImageBtn").onclick = () => {
-            constr name = prompt("Nombre de la imagen:");
-            ifs (name) {
-                timeline.image.push({name});
-                actualizarContadores();
-                notificar("Imagen añadida");
-            }
-        };
-    });
-</script>
-</body>
-</html>
-        .tools-panel { width: 280px; background: rgba(5,5,5,0.95); border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; flex-shrink: 0; }
         .tools-search { padding: 8px; border-bottom: 1px solid #1a1a1a; }
         .tools-search input { width: 100%; background: #0a0a0a; border: 1px solid #00ff41; color: #00ff41; padding: 6px; font-family: monospace; border-radius: 5px; font-size: 0.7rem; }
         .tools-categories { display: flex; gap: 5px; padding: 8px; border-bottom: 1px solid #1a1a1a; flex-wrap: wrap; }
         .cat-btn { background: none; border: 1px solid #333; color: #888; padding: 4px 10px; font-size: 0.65rem; cursor: pointer; border-radius: 15px; }
         .cat-btn.active { border-color: #00ff41; color: #00ff41; background: rgba(0,255,65,0.1); }
-        .effect-selector {
-            background: #0a0a0a;
-            border: 1px solid #00ff41;
-            border-radius: 8px;
-            padding: 10px;
-            margin: 10px;
-            text-align: center;
-        }
-        .effect-name {
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: #ff00ff;
-            background: #000;
-            padding: 6px;
-            border-radius: 5px;
-            margin: 6px 0;
-            word-break: break-word;
-        }
-        .effect-nav {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin: 8px 0;
-        }
-        .nav-arrow {
-            background: #111;
-            border: 1px solid #00ff41;
-            color: #00ff41;
-            font-size: 1rem;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .nav-arrow:hover {
-            background: #00ff41;
-            color: #000;
-        }
-        .apply-effect-btn {
-            background: #ff00ff20;
-            border: 1px solid #ff00ff;
-            color: #ff00ff;
-            padding: 5px 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            margin-top: 6px;
-            font-size: 0.65rem;
-        }
-        .apply-effect-btn:hover {
-            background: #ff00ff;
-            color: #000;
-        }
+
+        .effect-selector { background: #0a0a0a; border: 1px solid #00ff41; border-radius: 8px; padding: 10px; margin: 10px; text-align: center; }
+        .effect-name { font-size: 0.8rem; font-weight: bold; color: #ff00ff; background: #000; padding: 6px; border-radius: 5px; margin: 6px 0; word-break: break-word; }
+        .effect-nav { display: flex; justify-content: center; gap: 12px; margin: 8px 0; }
+        .nav-arrow { background: #111; border: 1px solid #00ff41; color: #00ff41; font-size: 1rem; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: 0.2s; }
+        .nav-arrow:hover { background: #00ff41; color: #000; }
+        .apply-effect-btn { background: #ff00ff20; border: 1px solid #ff00ff; color: #ff00ff; padding: 5px 10px; border-radius: 20px; cursor: pointer; margin-top: 6px; font-size: 0.65rem; }
+        .apply-effect-btn:hover { background: #ff00ff; color: #000; }
+
         .preview-panel { flex: 1; display: flex; flex-direction: column; background: #000; min-width: 0; }
-        .preview-area { 
-            flex: 1; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            background: #000; 
-            position: relative; 
-            border: 1px solid #1a1a1a; 
-            margin: 8px; 
-            border-radius: 10px; 
-            overflow: hidden; 
-            min-height: 200px;
-            max-height: 40vh;
-        }
-        #mainCanvas { 
-            width: auto; 
-            height: auto; 
-            max-width: 100%; 
-            max-height: 100%; 
-            object-fit: contain; 
-        }
+        .preview-area { flex: 1; display: flex; justify-content: center; align-items: center; background: #000; position: relative; border: 1px solid #1a1a1a; margin: 8px; border-radius: 10px; overflow: hidden; min-height: 200px; max-height: 40vh; }
+        #mainCanvas { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
         .time-display { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.8); padding: 2px 8px; border-radius: 5px; font-size: 0.65rem; color: #00ff41; border: 1px solid #00ff41; }
-        .controls { display: flex; gap: 8px; justify-content: center; padding: 8px; border-top: 1px solid #1a1a1a; flex-wrap: wrap; }
+
+        /* --- AJUSTE REPARADO LÍNEA 38 --- */
+        .controls { display: flex; gap: 8px; justify-content: center; padding: 12px; border-top: 1px solid #1a1a1a; flex-wrap: wrap; background: rgba(0,0,0,0.9); position: relative; z-index: 10; }
+        /* --- FIN AJUSTE REPARADO LÍNEA 38 --- */
+
         .ctrl-btn, .render-btn, .export-btn { background: rgba(0,255,65,0.1); border: 1px solid #00ff41; color: #00ff41; padding: 5px 12px; cursor: pointer; font-family: monospace; font-size: 0.7rem; border-radius: 20px; }
         .ctrl-btn:hover, .render-btn:hover, .export-btn:hover { background: #00ff41; color: #000; }
         .render-btn { background: #ff00ff20; border-color: #ff00ff; color: #ff00ff; }
         .export-btn { background: #00aaff20; border-color: #00aaff; color: #00aaff; }
-        .timeline-container { 
-            height: 48vh;
-            background: rgba(5,5,5,0.95); 
-            border-top: 2px solid #00ff41; 
-            display: flex; 
-            flex-direction: column; 
-            flex-shrink: 0; 
-        }
+
+        /* --- AJUSTE REPARADO LÍNEA 43 --- */
+        .timeline-container { height: 45vh; background: rgba(5,5,5,0.98); border-top: 2px solid #00ff41; display: flex; flex-direction: column; flex-shrink: 0; margin-top: 10px; position: relative; z-index: 1; }
+        /* --- FIN AJUSTE REPARADO LÍNEA 43 --- */
+
         .timeline-header { padding: 4px 12px; font-size: 0.65rem; color: #00aaff; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; }
         .timeline-controls button { background: none; border: 1px solid #333; color: #888; padding: 2px 8px; cursor: pointer; border-radius: 5px; font-size: 0.6rem; }
         .timeline-ruler { height: 20px; background: #0a0a0a; border-bottom: 1px solid #333; position: relative; overflow-x: auto; }
@@ -593,50 +59,28 @@
         .track { display: flex; height: 60px; border-bottom: 1px solid #1a1a1a; min-width: 100%; }
         .track-label { width: 80px; background: #0a0a0a; border-right: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; position: sticky; left: 0; }
         .track-clips { flex: 1; position: relative; background: #0a0a0a; min-height: 60px; }
-        .clip { 
-            position: absolute; 
-            height: 50px; 
-            border-radius: 5px; 
-            top: 5px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            padding-left: 6px; 
-            font-size: 0.55rem; 
-            overflow: hidden; 
-            white-space: nowrap;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            color: #fff;
-            text-shadow: 0 0 3px black;
-            border: 1px solid #00ff41;
-        }
-        .clip:not([style*="background-image"]) {
-            background: rgba(0, 255, 65, 0.3);
-        }
-        .clip::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            border-radius: 5px;
-            pointer-events: none;
-        }
-        .clip span {
-            position: relative;
-            z-index: 1;
-        }
+        .clip { position: absolute; height: 50px; border-radius: 5px; top: 5px; cursor: pointer; display: flex; align-items: center; padding-left: 6px; font-size: 0.55rem; overflow: hidden; white-space: nowrap; background-size: cover; background-position: center; background-repeat: no-repeat; color: #fff; text-shadow: 0 0 3px black; border: 1px solid #00ff41; }
+        .clip:not([style*="background-image"]) { background: rgba(0,255,65,0.3); }
+        .clip::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); border-radius: 5px; pointer-events: none; }
+        .clip span { position: relative; z-index: 1; }
         .playhead { position: absolute; width: 2px; height: 100%; background: #ff00ff; top: 0; pointer-events: none; box-shadow: 0 0 8px #ff00ff; }
+
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); justify-content: center; align-items: center; z-index: 1000; }
         .modal.show { display: flex; }
         .modal-content { background: #0a0a0a; border: 2px solid #00ff41; border-radius: 15px; padding: 20px; max-width: 500px; width: 90%; text-align: center; }
         .ai-result { background: #000; padding: 15px; margin: 15px 0; border: 1px solid #ff00ff; border-radius: 10px; color: #ff00ff; text-align: left; font-size: 0.75rem; max-height: 300px; overflow-y: auto; }
         .api-input { width: 100%; background: #111; border: 1px solid #00ff41; color: #00ff41; padding: 6px; margin: 8px 0; font-family: monospace; border-radius: 5px; }
         .btn { background: #00ff41; color: #000; border: none; padding: 8px 20px; cursor: pointer; font-family: monospace; font-weight: bold; border-radius: 25px; margin: 5px; }
+
+        .api-config { border: 1px solid #00ff41; border-radius: 8px; padding: 10px; margin: 10px; background: #0a0a0a; }
+        .api-config h4 { color: #ff00ff; font-size: 0.7rem; margin-bottom: 8px; text-align: center; }
+        .api-config input { width: 100%; background: #111; border: 1px solid #00ff41; color: #00ff41; padding: 5px; font-size: 0.6rem; margin-bottom: 6px; border-radius: 4px; }
+        .api-config button { background: #00aaff20; border: 1px solid #00aaff; color: #00aaff; padding: 4px 8px; font-size: 0.6rem; border-radius: 15px; cursor: pointer; width: 100%; }
+        .api-config button:hover { background: #00aaff; color: #000; }
+        .api-status { font-size: 0.55rem; margin-top: 4px; text-align: center; }
+        .status-ok { color: #00ff41; }
+        .status-missing { color: #ffaa00; }
+
         .footer { text-align: center; padding: 4px; font-size: 0.5rem; color: #444; border-top: 1px solid #1a1a1a; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #0a0a0a; }
@@ -644,56 +88,11 @@
         .ruler-mark { position: absolute; bottom: 0; width: 1px; height: 8px; background: #444; }
         .ruler-label { position: absolute; font-size: 6px; color: #666; bottom: 10px; }
         @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; transform: translateX(100px); } }
-        /* Estilos para panel de configuración de APIs */
-        .api-config {
-            border: 1px solid #00ff41;
-            border-radius: 8px;
-            padding: 10px;
-            margin: 10px;
-            background: #0a0a0a;
-        }
-        .api-config h4 {
-            color: #ff00ff;
-            font-size: 0.7rem;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-        .api-config input {
-            width: 100%;
-            background: #111;
-            border: 1px solid #00ff41;
-            color: #00ff41;
-            padding: 5px;
-            font-size: 0.6rem;
-            margin-bottom: 6px;
-            border-radius: 4px;
-        }
-        .api-config button {
-            background: #00aaff20;
-            border: 1px solid #00aaff;
-            color: #00aaff;
-            padding: 4px 8px;
-            font-size: 0.6rem;
-            border-radius: 15px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .api-config button:hover {
-            background: #00aaff;
-            color: #000;
-        }
-        .api-status {
-            font-size: 0.55rem;
-            margin-top: 4px;
-            text-align: center;
-        }
-        .status-ok { color: #00ff41; }
-        .status-missing { color: #ffaa00; }
     </style>
 </head>
 <body>
-<div class="cyber-bg"></div>
-<div class="app">
+
+<div class="app" style="display:flex;flex-direction:column;height:100vh;">
     <div class="header">
         <div class="logo">🎬 EMI 1719 <span>ULTIMATE</span> | APIs REALES: CloudConvert + Replicate + Remove.bg</div>
         <div class="stats">
@@ -703,6 +102,7 @@
             <span>🤖 6 IA</span>
         </div>
     </div>
+
     <div class="nav">
         <button class="nav-btn active" data-view="editor">🎬 EDITOR</button>
         <button class="nav-btn" data-view="video">🎥 VIDEO (100)</button>
@@ -711,24 +111,24 @@
         <button class="nav-btn" data-view="ai">🤖 AI STUDIO</button>
         <button class="nav-btn" data-view="export">📤 EXPORTAR</button>
     </div>
-    <div class="workspace">
+
+    <div class="workspace" style="flex:1;overflow:hidden;">
         <div class="tools-panel">
             <div class="tools-search">
                 <input type="text" id="searchTools" placeholder="🔍 Buscar efecto...">
             </div>
             <div class="tools-categories" id="categories"></div>
-            
-            <!-- NUEVO: Panel de configuración de APIs -->
+
             <div class="api-config">
                 <h4>🔑 CONFIGURACIÓN DE APIS</h4>
-                <input type="text" id="ccKey" placeholder="CloudConvert API Key" value="">
-                <input type="text" id="repKey" placeholder="Replicate API Token" value="">
-                <input type="text" id="removebgKey" placeholder="Remove.bg API Key" value="">
-                <input type="text" id="openaiKey" placeholder="OpenAI API Key" value="">
+                <input type="text" id="ccKey" placeholder="CloudConvert API Key">
+                <input type="text" id="repKey" placeholder="Replicate API Token">
+                <input type="text" id="removebgKey" placeholder="Remove.bg API Key">
+                <input type="text" id="openaiKey" placeholder="OpenAI API Key">
                 <button id="saveAllKeysBtn">💾 GUARDAR TODAS LAS CLAVES</button>
                 <div id="apiStatusMsg" class="api-status status-missing">⚠️ Claves no guardadas</div>
             </div>
-            
+
             <div class="effect-selector">
                 <div class="effect-name" id="currentEffectName">Corte 1</div>
                 <div class="effect-nav">
@@ -737,7 +137,7 @@
                 </div>
                 <button id="applyEffectBtn" class="apply-effect-btn">APLICAR EFECTO</button>
             </div>
-            
+
             <div class="effect-selector">
                 <div class="effect-name" id="currentIaEffectName">🧠 REMOVER FONDO IA</div>
                 <div class="effect-nav">
@@ -746,9 +146,8 @@
                 </div>
                 <button id="applyIaBtn" class="apply-effect-btn">APLICAR IA</button>
             </div>
-            
-            <div id="toolsList" style="display:none;"></div>
         </div>
+
         <div class="preview-panel">
             <div class="preview-area">
                 <canvas id="mainCanvas" width="800" height="450"></canvas>
@@ -768,6 +167,7 @@
             </div>
         </div>
     </div>
+
     <div class="timeline-container">
         <div class="timeline-header">
             <span>⏱️ TIMELINE MULTICAPA</span>
@@ -778,14 +178,15 @@
             </div>
         </div>
         <div class="timeline-ruler" id="ruler"></div>
-        <div class="timeline-tracks">
+        <div class="timeline-tracks" style="position:relative;">
             <div class="track"><div class="track-label">🎬 VIDEO</div><div class="track-clips" id="videoTrack"></div></div>
             <div class="track"><div class="track-label">🎵 AUDIO</div><div class="track-clips" id="audioTrack"></div></div>
             <div class="track"><div class="track-label">🖼️ FOTOS</div><div class="track-clips" id="imageTrack"></div></div>
             <div class="track"><div class="track-label">✨ MOVIMIENTO</div><div class="track-clips" id="motionTrack"></div></div>
+            <div id="playhead" class="playhead" style="left:0px;"></div>
         </div>
-        <div id="playhead" class="playhead" style="left: 0px;"></div>
     </div>
+
     <div class="footer">
         🎬 100 VIDEO | 🖼️ 100 FOTO | 🎵 100 AUDIO | 🤖 6 IA | CLOUDCONVERT | REPLICATE | REMOVE.BG
     </div>
@@ -803,18 +204,17 @@
 
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
 <script>
-    // ============ GENERAR 306 HERRAMIENTAS (sin cambios) ============
-    constr videoEffects = ["Corte","Zoom","Rotación","Velocidad","Reverse","Loop","Transición","Fade","Estabilización","Croma Key","Máscara","PIP","Split Screen","Time Lapse","Slow Motion","Fast Motion","Keyframe","Desenfoque","Enfoque","Brillo","Contraste","Saturación","Tono","Vigneta","Glitch","Pixelate","Neon","Scanlines","VHS","Retro","Cyberpunk","Sepia","BN","Invertir","Espejo","Girar"];
-    constr photoEffects = ["Recorte","Redimensionar","Rotar","Voltear","Enderezar","Perspectiva","Lente","Desenfoque","Brillo","Contraste","Saturación","Exposición","Balance Blancos","Nitidez","Reducción Ruido","Ojos Rojos","Piel Suave","Filtro","Marco","Texto","Máscara","Opacidad","Sombra","Resplandor","Relieve","Textura","Mosaico","Glitch","Neon","Vintage","Retro","Cinematic","Sepia","BN","Acuarela","Óleo"];
-    constr audioEffects = ["Volumen","Ecualizador","Bajos","Agudos","Reverb","Eco","Delay","Chorus","Flanger","Phaser","Distorsión","Compresor","Limitador","Normalizar","Balance","Estéreo","Mono","Fade","Crossfade","Loop","Reverse","Velocidad","Pitch","Auto-Tune","Vocoder","Wah-Wah","Reducción Ruido","Vinilo","Cassette","Radio","Teléfono","Robot"];
-    
-    constr videoTools = [], photoTools = [], audioTools = [];
-    for (le ti = 0; i < 100; i++) {
+    // ============ GENERAR 306 HERRAMIENTAS ============
+    const videoEffects = ["Corte","Zoom","Rotación","Velocidad","Reverse","Loop","Transición","Fade","Estabilización","Croma Key","Máscara","PIP","Split Screen","Time Lapse","Slow Motion","Fast Motion","Keyframe","Desenfoque","Enfoque","Brillo","Contraste","Saturación","Tono","Vigneta","Glitch","Pixelate","Neon","Scanlines","VHS","Retro","Cyberpunk","Sepia","BN","Invertir","Espejo","Girar"];
+    const photoEffects = ["Recorte","Redimensionar","Rotar","Voltear","Enderezar","Perspectiva","Lente","Desenfoque","Brillo","Contraste","Saturación","Exposición","Balance Blancos","Nitidez","Reducción Ruido","Ojos Rojos","Piel Suave","Filtro","Marco","Texto","Máscara","Opacidad","Sombra","Resplandor","Relieve","Textura","Mosaico","Glitch","Neon","Vintage","Retro","Cinematic","Sepia","BN","Acuarela","Óleo"];
+    const audioEffects = ["Volumen","Ecualizador","Bajos","Agudos","Reverb","Eco","Delay","Chorus","Flanger","Phaser","Distorsión","Compresor","Limitador","Normalizar","Balance","Estéreo","Mono","Fade","Crossfade","Loop","Reverse","Velocidad","Pitch","Auto-Tune","Vocoder","Wah-Wah","Reducción Ruido","Vinilo","Cassette","Radio","Teléfono","Robot"];
+    const videoTools = [], photoTools = [], audioTools = [];
+    for (let i = 0; i < 100; i++) {
         videoTools.push({ name: videoEffects[i % videoEffects.length] + (Math.floor(i / videoEffects.length) + 1), category: "video", desc: "Efecto profesional" });
         photoTools.push({ name: photoEffects[i % photoEffects.length] + (Math.floor(i / photoEffects.length) + 1), category: "photo", desc: "Efecto profesional" });
         audioTools.push({ name: audioEffects[i % audioEffects.length] + (Math.floor(i / audioEffects.length) + 1), category: "audio", desc: "Efecto profesional" });
     }
-    constr aiTools = [
+    const aiTools = [
         { name: "🧠 REMOVER FONDO IA", desc: "Elimina fondo con IA (remove.bg)", apiType: "removebg" },
         { name: "✨ MEJORAR VIDEO IA", desc: "Mejora calidad con IA (Replicate GFPGAN)", apiType: "enhance" },
         { name: "🔇 REDUCIR RUIDO IA", desc: "Elimina ruido con IA (Replicate audio)", apiType: "denoise" },
@@ -822,35 +222,43 @@
         { name: "📝 GENERAR GUION IA", desc: "Crea guiones con IA (OpenAI GPT)", apiType: "script" },
         { name: "🎬 AUTO DIRECTOR IA", desc: "Sugiere cortes óptimos (lógica local)", apiType: "director" }
     ];
-    constr allTools = [...videoTools, ...photoTools, ...audioTools];
+    const allTools = [...videoTools, ...photoTools, ...audioTools];
 
-    // ============ TIMELINE Y DEMÁS ============
-    l et timeline = { video: [], audio: [], image: [], motion: [] };
-    l et nextClipId = 1;
-    l et currentTime = 0;
-    l et isPlaying = false;
-    l et animFrame = nul;
-     l et zoom = 20;
-    l et imagenesCargadas = [];
-    l et audioElementos = [];
-    l et animaciones = [];
+    // ============ VARIABLES GLOBALES ============
+    let timeline = { video: [], audio: [], image: [], motion: [] };
+    let nextClipId = 1;
+    let currentTime = 0;
+    let isPlaying = false;
+    let animFrame = null;
+    let zoom = 20;
+    let imagenesCargadas = [];
+    let audioElementos = [];
+    let animaciones = [];
+    let imageCache = new Map();
+    let categoriaActual = "all";
+    let busqueda = "";
+    let currentEffectIndex = 0;
+    let currentFilteredTools = [];
+    let currentIaIndex = 0;
+    let iaToolsList = aiTools;
+    let ffmpeg = null;
+    let currentApiType = null;
+    let currentApiName = null;
 
-    // Caché para imágenes precargadas
-    l et imageCache = New Map();
-
-    funtion addToTimeline(type, name, duration = 10, archivo = null) {
-        letS nuevoClip = { id: nextClipId++, name: name, start: getMaxDuration(), duration: duration, type: type, archivo: archivo };
+    // ============ TIMELINE ============
+    function addToTimeline(type, name, duration = 10, archivo = null) {
+        let nuevoClip = { id: nextClipId++, name: name, start: getMaxDuration(), duration: duration, type: type, archivo: archivo };
         timeline[type].push(nuevoClip);
-        ifs (type === "image" && archivo) {
+        if (type === "image" && archivo) {
             imagenesCargadas.push({ id: nuevoClip.id, url: archivo, start: nuevoClip.start, duration: duration });
-            ifs (!imageCache.has(archivo)) {
-                let img = New Image();
+            if (!imageCache.has(archivo)) {
+                let img = new Image();
                 img.src = archivo;
                 imageCache.set(archivo, img);
             }
         }
-        ifs (type === "audio" && archivo) {
-            letS audio = New Audio(archivo);
+        if (type === "audio" && archivo) {
+            let audio = new Audio(archivo);
             audio.preload = "auto";
             audioElementos.push({ id: nuevoClip.id, audio: audio, start: nuevoClip.start, duration: duration });
         }
@@ -858,52 +266,51 @@
         actualizarContadores();
         notificar(`✅ "${name}" agregado a ${type}`);
     }
-    funtion getMaxDuration() {
-        leAt max = 0;
-        forD (lets t of Object.values(timeline)) for (let c of t) max = Math.max(max, c.start + c.duration);
-        Return Math.max(max, 10);
+
+    function getMaxDuration() {
+        let max = 0;
+        for (let t of Object.values(timeline)) for (let c of t) max = Math.max(max, c.start + c.duration);
+        return Math.max(max, 10);
     }
-    funtion renderTimeline() {
-        constT tracks = { video: "videoTrack", audio: "audioTrack", image: "imageTrack", motion: "motionTrack" };
-        fosr (letS [tipo, id] of Object.entries(tracks)) {
-            letS cont = document.getElementById(id);
-            ifs (cont) {
+
+    function renderTimeline() {
+        const tracks = { video: "videoTrack", audio: "audioTrack", image: "imageTrack", motion: "motionTrack" };
+        for (let [tipo, id] of Object.entries(tracks)) {
+            let cont = document.getElementById(id);
+            if (cont) {
                 cont.innerHTML = "";
-                letS anchoTotal = getMaxDuration() * zoom;
+                let anchoTotal = getMaxDuration() * zoom;
                 cont.style.width = anchoTotal + "px";
-                forD (letS clip of timeline[tipo]) {
-                    letS div = document.createElement("div");
+                for (let clip of timeline[tipo]) {
+                    let div = document.createElement("div");
                     div.className = "clip";
                     div.style.left = (clip.start * zoom) + "px";
                     div.style.width = (clip.duration * zoom) + "px";
-                    
                     if (tipo === "image" && clip.archivo) {
                         div.style.backgroundImage = `url(${clip.archivo})`;
                         div.style.backgroundSize = "cover";
                         div.style.backgroundPosition = "center";
                     }
-                    
-                    letS span = document.createElement("span");
+                    let span = document.createElement("span");
                     span.textContent = clip.name.substring(0, 16);
                     div.appendChild(span);
-                    
                     div.title = `${clip.name}\nInicio: ${clip.start}s\nDuración: ${clip.duration}s`;
                     div.onmousedown = (e) => iniciarArrastre(e, clip, tipo);
                     cont.appendChild(div);
                 }
             }
         }
-        letS ruler = document.getElementById("ruler");
-        letS maxT = getMaxDuration() + 5;
+        let ruler = document.getElementById("ruler");
+        let maxT = getMaxDuration() + 5;
         ruler.innerHTML = "";
         ruler.style.width = (maxT * zoom) + "px";
-        forD (lets i = 0; i <= maxT; i++) {
-            lets marca = document.createElement("div");
+        for (let i = 0; i <= maxT; i++) {
+            let marca = document.createElement("div");
             marca.className = "ruler-mark";
             marca.style.left = (i * zoom) + "px";
             ruler.appendChild(marca);
             if (i % 5 === 0) {
-                lets label = document.createElement("div");
+                let label = document.createElement("div");
                 label.className = "ruler-label";
                 label.style.left = (i * zoom + 2) + "px";
                 label.textContent = i + "s";
@@ -912,140 +319,146 @@
         }
         document.getElementById("playhead").style.left = (currentTime * zoom) + "px";
     }
-    funtion iniciarArrastre(e, clip, track) {
+
+    function iniciarArrastre(e, clip, track) {
         e.stopPropagation();
-        lets inicioX = e.clientX;
-        lets inicioStart = clip.start;
-        lets mover = (me) => {
-            lets nuevo = inicioStart + (me.clientX - inicioX) / zoom;
+        let inicioX = e.clientX;
+        let inicioStart = clip.start;
+        let mover = (me) => {
+            let nuevo = inicioStart + (me.clientX - inicioX) / zoom;
             nuevo = Math.max(0, Math.min(nuevo, getMaxDuration() - clip.duration));
             clip.start = nuevo;
-            if (track === "image") { lets img = imagenesCargadas.find(i => i.id === clip.id); if (img) img.start = nuevo; }
-            if (track === "audio") { lets aud = audioElementos.find(a => a.id === clip.id); if (aud) aud.start = nuevo; }
+            if (track === "image") { let img = imagenesCargadas.find(i => i.id === clip.id); if (img) img.start = nuevo;
+            }
+            if (track === "audio") { let aud = audioElementos.find(a => a.id === clip.id);
+            if (aud) aud.start = nuevo; }
             renderTimeline();
         };
-        lets soltar = () => { document.removeEventListener("mousemove", mover); document.removeEventListener("mouseup", soltar); };
+        let soltar = () => { document.removeEventListener("mousemove", mover); document.removeEventListener("mouseup", soltar); };
         document.addEventListener("mousemove", mover);
         document.addEventListener("mouseup", soltar);
     }
-    constr canvas = document.getElementById("mainCanvas");
-    constr ctx = canvas.getContext("2d");
-    funtion crearMovimiento(idImagen, duracion, tipoMovimiento) {
-        lets animacion = { id: Date.now(), imagenId: idImagen, duracion: duracion, tipo: tipoMovimiento, inicio: currentTime };
+
+    const canvas = document.getElementById("mainCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function crearMovimiento(idImagen, duracion, tipoMovimiento) {
+        let animacion = { id: Date.now(), imagenId: idImagen, duracion: duracion, tipo: tipoMovimiento, inicio: currentTime };
         animaciones.push(animacion);
         timeline.motion.push({ id: animacion.id, name: `Movimiento ${tipoMovimiento}`, start: currentTime, duration: duracion, tipo: tipoMovimiento });
         renderTimeline();
         notificar(`✨ Movimiento ${tipoMovimiento} agregado`);
     }
-    funtion dibujarPreview() {
+
+    function dibujarPreview() {
         ctx.fillStyle = "#000000";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        lets imagenesActivas = imagenesCargadas.filter(img => currentTime >= img.start && currentTime <= img.start + img.duration);
+        let imagenesActivas = imagenesCargadas.filter(img => currentTime >= img.start && currentTime <= img.start + img.duration);
         if (imagenesActivas.length > 0) {
             imagenesActivas.forEach(img => {
-                lets imgObj = imageCache.get(img.url);
+                let imgObj = imageCache.get(img.url);
                 if (!imgObj || !imgObj.complete) {
                     if (!imageCache.has(img.url)) {
-                        imgObj = New Image();
+                        imgObj = new Image();
                         imgObj.src = img.url;
                         imageCache.set(img.url, imgObj);
-                    } els {
+                    } else {
                         imgObj = imageCache.get(img.url);
                     }
                 }
-                ifs (imgObj && imgObj.complete) {
-                    lets ancho = canvas.width, alto = canvas.height;
-                    lets escala = Math.min(ancho / imgObj.width, alto / imgObj.height);
-                    lets x = (ancho - imgObj.width * escala) / 2, y = (alto - imgObj.height * escala) / 2;
-                    lets tiempoEnClip = currentTime - img.start;
-                    lets anim = animaciones.find(a => a.imagenId === img.id && tiempoEnClip >= 0 && tiempoEnClip <= a.duracion);
-                    ifs (anim) {
-                        lets progreso = tiempoEnClip / anim.duracion;
-                        ifs (anim.tipo === "zoom") {
-                            lets zoomFactor = 1 + progreso * 0.5;
-                            lets nuevoAncho = imgObj.width * escala * zoomFactor, nuevoAlto = imgObj.height * escala * zoomFactor;
+                if (imgObj && imgObj.complete) {
+                    let ancho = canvas.width, alto = canvas.height;
+                    let escala = Math.min(ancho / imgObj.width, alto / imgObj.height);
+                    let x = (ancho - imgObj.width * escala) / 2, y = (alto - imgObj.height * escala) / 2;
+                    let tiempoEnClip = currentTime - img.start;
+                    let anim = animaciones.find(a => a.imagenId === img.id && tiempoEnClip >= 0 && tiempoEnClip <= a.duracion);
+                    if (anim) {
+                        let progreso = tiempoEnClip / anim.duracion;
+                        if (anim.tipo === "zoom") {
+                            let zoomFactor = 1 + progreso * 0.5;
+                            let nuevoAncho = imgObj.width * escala * zoomFactor, nuevoAlto = imgObj.height * escala * zoomFactor;
                             x = (ancho - nuevoAncho) / 2; y = (alto - nuevoAlto) / 2;
                             ctx.drawImage(imgObj, x, y, nuevoAncho, nuevoAlto);
-                        } els ifs (anim.tipo === "pan") {
-                            lets desplazamientoX = progreso * 100;
+                        } else if (anim.tipo === "pan") {
+                            let desplazamientoX = progreso * 100;
                             ctx.drawImage(imgObj, x + desplazamientoX, y, imgObj.width * escala, imgObj.height * escala);
-                        } els {
+                        } else {
                             ctx.drawImage(imgObj, x, y, imgObj.width * escala, imgObj.height * escala);
                         }
-                    } ele {
+                    } else {
                         ctx.drawImage(imgObj, x, y, imgObj.width * escala, imgObj.height * escala);
                     }
                 }
             });
-        } ele {
+        } else {
             ctx.font = "bold 16px monospace";
             ctx.fillStyle = "#00ff41";
-            ctx.fillText("🎬 EMI 1719 ULTIMATE", canvas.width/2 - 120, canvas.height/2 - 15);
+            ctx.fillText("🎬 EMI 1719 ULTIMATE", canvas.width / 2 - 120, canvas.height / 2 - 15);
             ctx.font = "9px monospace";
             ctx.fillStyle = "#00aaff";
-            ctx.fillText("IMPORTA FOTOS | MOVIMIENTO | AUDIO", canvas.width/2 - 150, canvas.height/2 + 15);
+            ctx.fillText("IMPORTA FOTOS | MOVIMIENTO | AUDIO", canvas.width / 2 - 150, canvas.height / 2 + 15);
         }
-        lets mins = Math.floor(currentTime / 60), secs = Math.floor(currentTime % 60);
+        let mins = Math.floor(currentTime / 60), secs = Math.floor(currentTime % 60);
         document.getElementById("timeDisplay").innerHTML = `${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
     }
-    
-    // ============ REPRODUCIR AUDIO REAL ============
-    funtion desbloquearAudioCompleto() {
-        tri {
-            lets audioCtx = New (window.AudioContext || window.webkitAudioContext)();
-            lest gainNode = audioCtx.createGain();
+
+    // ============ AUDIO ============
+    function desbloquearAudioCompleto() {
+        try {
+            let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            let gainNode = audioCtx.createGain();
             gainNode.gain.value = 0;
-            lets oscillator = audioCtx.createOscillator();
+            let oscillator = audioCtx.createOscillator();
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
             oscillator.start();
             oscillator.stop(0.001);
             audioCtx.close();
-        } catche) { console.log("AudioContext unlock error", e); }
-        lets silentAudio = New Audio();
+        } catch(e) { console.log("AudioContext unlock error", e); }
+        let silentAudio = new Audio();
         silentAudio.volume = 0;
         silentAudio.play().then(() => silentAudio.pause()).catch(e => console.log("Silent audio failed", e));
     }
-    
-    funtion desbloquearAudio() {
-        letS silentAudio = New Audio();
+
+    function desbloquearAudio() {
+        let silentAudio = new Audio();
         silentAudio.volume = 0;
         silentAudio.play().then(() => silentAudio.pause()).catch(e => console.log("Audio unlock falló:", e));
     }
-    
-    funtion reproducirAudiosEnTiempo() {
-        forD (lets aud of audioElementos) {
-            constr enRango = (currentTime >= aud.start && currentTime <= aud.start + aud.duration);
-            ifs (enRango) {
-                ifs (aud.audio.paused) {
+
+    function reproducirAudiosEnTiempo() {
+        for (let aud of audioElementos) {
+            const enRango = (currentTime >= aud.start && currentTime <= aud.start + aud.duration);
+            if (enRango) {
+                if (aud.audio.paused) {
                     aud.audio.currentTime = currentTime - aud.start;
                     aud.audio.play().catch(e => console.log("Error reproduciendo audio:", e));
                 }
-            } els {
-                ifs (!aud.audio.paused) {
+            } else {
+                if (!aud.audio.paused) {
                     aud.audio.pause();
                 }
             }
         }
     }
-    
-    funtion detenerTodosAudios() {
-        ford (lets aud of audioElementos) {
+
+    function detenerTodosAudios() {
+        for (let aud of audioElementos) {
             aud.audio.pause();
             aud.audio.currentTime = 0;
         }
     }
-    
-    funtion playTimeline() {
-        ifs (isPlaying) Return;
+
+    function playTimeline() {
+        if (isPlaying) return;
         desbloquearAudioCompleto();
         desbloquearAudio();
         setTimeout(() => {
             isPlaying = true;
-            funtion animar() {
-                ifs (!isPlaying) Return;
+            function animar() {
+                if (!isPlaying) return;
                 currentTime += 0.033;
-                ifs (currentTime >= getMaxDuration()) {
+                if (currentTime >= getMaxDuration()) {
                     currentTime = 0;
                     detenerTodosAudios();
                 }
@@ -1058,39 +471,75 @@
         }, 100);
         notificar("▶ Reproduciendo timeline");
     }
-    
-    funtion pausarTimeline() { 
-        isPlaying = false; 
-        ifs (animFrame) cancelAnimationFrame(animFrame);
-        fors (lets aud of audioElementos) { aud.audio.pause(); }
-        notificar("⏸ Pausado"); 
+
+    function pausarTimeline() {
+        isPlaying = false;
+        if (animFrame) cancelAnimationFrame(animFrame);
+        for (let aud of audioElementos) { aud.audio.pause(); }
+        notificar("⏸ Pausado");
     }
-    
-    funtion detenerTimeline() { 
-        isPlaying = false; 
-        ifa (animFrame) cancelAnimationFrame(animFrame); 
-        currentTime = 0; 
+
+    function detenerTimeline() {
+        isPlaying = false;
+        if (animFrame) cancelAnimationFrame(animFrame);
+        currentTime = 0;
         detenerTodosAudios();
-        dibujarPreview(); 
-        renderTimeline(); 
-        notificar("⏹ Detenido"); 
+        dibujarPreview();
+        renderTimeline();
+        notificar("⏹ Detenido");
     }
-    
-    funtion importarVideo() { lets input = document.createElement("input"); input.type = "file"; input.accept = "video/*"; input.onchange = (e) => { let file = e.target.files[0]; if (file) { addToTimeline("video", file.name, 15, URL.createObjectURL(file)); notificar(`📹 Video: ${file.name}`); } }; input.click(); }
-    funcion importarImagen() { lest input = document.createElement("input"); input.type = "file"; input.accept = "image/*"; input.onchange = (e) => { let file = e.target.files[0]; if (file) { let url = URL.createObjectURL(file); addToTimeline("image", file.name, 8, url); notificar(`🖼️ Foto cargada: ${file.name}`); setTimeout(() => { if (confirm(`✨ ¿Agregar movimiento a "${file.name}"?\nOK = Zoom | Cancel = Sin movimiento`)) { let ultimaImg = imagenesCargadas[imagenesCargadas.length - 1]; crearMovimiento(ultimaImg.id, 8, "zoom"); } }, 500); } }; input.click(); }
-    funtion importarAudio() { lets input = document.createElement("input"); input.type = "file"; input.accept = "audio/*"; input.onchange = (e) => { let file = e.target.files[0]; if (file) { let url = URL.createObjectURL(file); addToTimeline("audio", file.name, 20, url); notificar(`🎵 Audio importado: ${file.name} - SONIDO REAL`); } }; input.click(); }
-    
-    // ============ HERRAMIENTAS UI CON SELECTOR DE FLECHAS ============
-    lets categoriaActual = "all";
-    lets busqueda = "";
-    lets currentEffectIndex = 0;
-    lets currentFilteredTools = [];
-    lets currentIaIndex = 0;
-    lets iaToolsList = aiTools;
-    
-    funtion renderCategorias() {
-        lets cont = document.getElementById("categories");
-        lets cats = [
+
+    function importarVideo() {
+        let input = document.createElement("input");
+        input.type = "file";
+        input.accept = "video/*";
+        input.onchange = (e) => {
+            let file = e.target.files[0];
+            if (file) { addToTimeline("video", file.name, 15, URL.createObjectURL(file)); notificar(`📹 Video: ${file.name}`); }
+        };
+        input.click();
+    }
+
+    function importarImagen() {
+        let input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.onchange = (e) => {
+            let file = e.target.files[0];
+            if (file) {
+                let url = URL.createObjectURL(file);
+                addToTimeline("image", file.name, 8, url);
+                notificar(`🖼️ Foto cargada: ${file.name}`);
+                setTimeout(() => {
+                    if (confirm(`✨ ¿Agregar movimiento a "${file.name}"?\nOK = Zoom | Cancel = Sin movimiento`)) {
+                        let ultimaImg = imagenesCargadas[imagenesCargadas.length - 1];
+                        crearMovimiento(ultimaImg.id, 8, "zoom");
+                    }
+                }, 500);
+            }
+        };
+        input.click();
+    }
+
+    function importarAudio() {
+        let input = document.createElement("input");
+        input.type = "file";
+        input.accept = "audio/*";
+        input.onchange = (e) => {
+            let file = e.target.files[0];
+            if (file) {
+                let url = URL.createObjectURL(file);
+                addToTimeline("audio", file.name, 20, url);
+                notificar(`🎵 Audio importado: ${file.name} - SONIDO REAL`);
+            }
+        };
+        input.click();
+    }
+
+    // ============ HERRAMIENTAS UI ============
+    function renderCategorias() {
+        let cont = document.getElementById("categories");
+        let cats = [
             { id: "all", name: "📁 TODAS (300)" },
             { id: "video", name: "🎬 VIDEO (100)" },
             { id: "photo", name: "🖼️ FOTO (100)" },
@@ -1104,18 +553,18 @@
             actualizarListaFiltrada();
         });
     }
-    
-    funtion actualizarListaFiltrada() {
-        lets herramientas;
-        ifs (categoriaActual === "ai") {
+
+    function actualizarListaFiltrada() {
+        let herramientas;
+        if (categoriaActual === "ai") {
             herramientas = aiTools;
-        } els ifs (categoriaActual === "all") {
+        } else if (categoriaActual === "all") {
             herramientas = allTools;
-        } els ifa (categoriaActual === "video") {
+        } else if (categoriaActual === "video") {
             herramientas = videoTools;
-        } els if (categoriaActual === "photo") {
+        } else if (categoriaActual === "photo") {
             herramientas = photoTools;
-        } els if (categoriaActual === "audio") {
+        } else if (categoriaActual === "audio") {
             herramientas = audioTools;
         } else {
             herramientas = [];
@@ -1128,8 +577,8 @@
         if (currentEffectIndex < 0) currentEffectIndex = 0;
         actualizarEfectoActual();
     }
-    
-    funtion actualizarEfectoActual() {
+
+    function actualizarEfectoActual() {
         const effectNameSpan = document.getElementById("currentEffectName");
         if (currentFilteredTools.length === 0) {
             effectNameSpan.innerText = "No hay efectos";
@@ -1137,32 +586,30 @@
             effectNameSpan.innerText = currentFilteredTools[currentEffectIndex].name;
         }
     }
-    
-    funtion aplicarEfectoActual() {
-        if (currentFilteredTools.length === 0) {
-            notificar("❌ No hay efecto seleccionado");
-            return;
-        }
-        Const tool = currentFilteredTools[currentEffectIndex];
+
+    function aplicarEfectoActual() {
+        if (currentFilteredTools.length === 0) { notificar("❌ No hay efecto seleccionado");
+        return; }
+        const tool = currentFilteredTools[currentEffectIndex];
         if (categoriaActual === "ai") {
             abrirModalIA(tool.name, tool.apiType);
         } else {
             notificar(`✅ Aplicando: ${tool.name}`);
         }
     }
-    
-    funtion prevEffect() {
+
+    function prevEffect() {
         if (currentFilteredTools.length === 0) return;
         currentEffectIndex = (currentEffectIndex - 1 + currentFilteredTools.length) % currentFilteredTools.length;
         actualizarEfectoActual();
     }
-    funtion nextEffect() {
+    function nextEffect() {
         if (currentFilteredTools.length === 0) return;
         currentEffectIndex = (currentEffectIndex + 1) % currentFilteredTools.length;
         actualizarEfectoActual();
     }
-    
-    funtion actualizarIaActual() {
+
+    function actualizarIaActual() {
         const iaNameSpan = document.getElementById("currentIaEffectName");
         if (iaToolsList.length === 0) {
             iaNameSpan.innerText = "No hay IA";
@@ -1170,35 +617,33 @@
             iaNameSpan.innerText = iaToolsList[currentIaIndex].name;
         }
     }
-    funtion prevIa() {
+    function prevIa() {
         if (iaToolsList.length === 0) return;
         currentIaIndex = (currentIaIndex - 1 + iaToolsList.length) % iaToolsList.length;
         actualizarIaActual();
     }
-    funtion nextIa() {
+    function nextIa() {
         if (iaToolsList.length === 0) return;
         currentIaIndex = (currentIaIndex + 1) % iaToolsList.length;
         actualizarIaActual();
     }
-    funtion aplicarIaActual() {
-        if (iaToolsList.length === 0) {
-            notificar("❌ No hay herramientas IA");
-            return;
-        }
+    function aplicarIaActual() {
+        if (iaToolsList.length === 0) { notificar("❌ No hay herramientas IA");
+        return; }
         const tool = iaToolsList[currentIaIndex];
         abrirModalIA(tool.name, tool.apiType);
     }
-    
-    // ============ GESTIÓN DE CLAVES (panel y localStorage) ============
-    funtion cargarClavesEnPanel() {
+
+    // ============ GESTIÓN DE CLAVES ============
+    function cargarClavesEnPanel() {
         document.getElementById("ccKey").value = localStorage.getItem('cloudconvert_key') || '';
         document.getElementById("repKey").value = localStorage.getItem('replicate_key') || '';
         document.getElementById("removebgKey").value = localStorage.getItem('removebg_key') || '';
         document.getElementById("openaiKey").value = localStorage.getItem('openai_key') || '';
         actualizarEstadoClaves();
     }
-    
-    funtion guardarTodasLasClaves() {
+
+    function guardarTodasLasClaves() {
         localStorage.setItem('cloudconvert_key', document.getElementById("ccKey").value);
         localStorage.setItem('replicate_key', document.getElementById("repKey").value);
         localStorage.setItem('removebg_key', document.getElementById("removebgKey").value);
@@ -1206,13 +651,13 @@
         actualizarEstadoClaves();
         notificar("🔑 Todas las claves guardadas correctamente");
     }
-    
+
     function actualizarEstadoClaves() {
-        constr cc = localStorage.getItem('cloudconvert_key');
-        consts rep = localStorage.getItem('replicate_key');
+        const cc = localStorage.getItem('cloudconvert_key');
+        const rep = localStorage.getItem('replicate_key');
         const rb = localStorage.getItem('removebg_key');
         const oa = localStorage.getItem('openai_key');
-        constr statusDiv = document.getElementById("apiStatusMsg");
+        const statusDiv = document.getElementById("apiStatusMsg");
         let okCount = 0;
         if (cc) okCount++;
         if (rep) okCount++;
@@ -1226,44 +671,38 @@
             statusDiv.className = "api-status status-missing";
         }
     }
-    
-    // ============ API REAL CON PERSISTENCIA (usando localStorage) ============
-    let currentApiType = null;
-    let currentApiName = null;
-    
+
+    // ============ MODAL IA ============
     function abrirModalIA(nombre, apiType) {
         currentApiType = apiType;
         currentApiName = nombre;
         document.getElementById("modalTitle").innerText = `🤖 ${nombre}`;
         document.getElementById("aiResult").innerHTML = "Esperando acción...";
-        lets keyArea = document.getElementById("apiKeyArea");
-        
-        // No mostramos campo de entrada si la clave ya está guardada, solo un mensaje
-        lets savedKey = "";
-        ifs (apiType === "removebg") savedKey = localStorage.getItem('removebg_key') || "";
+        let keyArea = document.getElementById("apiKeyArea");
+
+        let savedKey = "";
+        if (apiType === "removebg") savedKey = localStorage.getItem('removebg_key') || "";
         else if (apiType === "enhance" || apiType === "denoise" || apiType === "colorize") savedKey = localStorage.getItem('replicate_key') || "";
         else if (apiType === "script") savedKey = localStorage.getItem('openai_key') || "";
-        
         if (savedKey) {
             keyArea.innerHTML = `<small>✅ Clave ya guardada. Ejecutando...</small>`;
-            // Ejecutar directamente
             ejecutarApiConClave(savedKey);
         } else {
             if (apiType === "removebg") {
-                keyArea.innerHTML = `<input type="text" id="apiKeyInput" class="api-input" placeholder="Tu API Key de remove.bg" value=""><br><small>Necesitas clave de remove.bg</small>`;
+                keyArea.innerHTML = `<input type="text" id="apiKeyInput" class="api-input" placeholder="Tu API Key de remove.bg"><br><small>Necesitas clave de remove.bg</small>`;
             } else if (apiType === "enhance" || apiType === "denoise" || apiType === "colorize") {
-                keyArea.innerHTML = `<input type="text" id="apiKeyInput" class="api-input" placeholder="Tu API Token de Replicate" value=""><br><small>Necesitas token de Replicate</small>`;
+                keyArea.innerHTML = `<input type="text" id="apiKeyInput" class="api-input" placeholder="Tu API Token de Replicate"><br><small>Necesitas token de Replicate</small>`;
             } else if (apiType === "script") {
-                keyArea.innerHTML = `<input type="text" id="apiKeyInput" class="api-input" placeholder="Tu API Key de OpenAI" value=""><br><small>Necesitas clave de OpenAI</small>`;
+                keyArea.innerHTML = `<input type="text" id="apiKeyInput" class="api-input" placeholder="Tu API Key de OpenAI"><br><small>Necesitas clave de OpenAI</small>`;
             } else {
                 keyArea.innerHTML = `<small>Auto Director usa lógica local.</small>`;
                 ejecutarApiConClave("");
+                document.getElementById("aiModal").classList.add("show");
                 return;
             }
             document.getElementById("executeApiBtn").onclick = () => {
                 let apiKey = document.getElementById("apiKeyInput") ? document.getElementById("apiKeyInput").value : "";
                 if (apiKey) {
-                    // Guardar en localStorage
                     if (currentApiType === "removebg") localStorage.setItem('removebg_key', apiKey);
                     else if (currentApiType === "enhance" || currentApiType === "denoise" || currentApiType === "colorize") localStorage.setItem('replicate_key', apiKey);
                     else if (currentApiType === "script") localStorage.setItem('openai_key', apiKey);
@@ -1273,16 +712,13 @@
                     document.getElementById("aiResult").innerHTML = "❌ Debes introducir una clave de API válida.";
                 }
             };
-            document.getElementById("aiModal").classList.add("show");
-            return;
         }
         document.getElementById("aiModal").classList.add("show");
     }
-    
+
     async function ejecutarApiConClave(apiKey) {
         let resultDiv = document.getElementById("aiResult");
         resultDiv.innerHTML = "🔄 Conectando con la API...";
-        
         try {
             if (currentApiType === "removebg") {
                 resultDiv.innerHTML = "📸 Selecciona una imagen para eliminar fondo...";
@@ -1334,10 +770,10 @@
                 };
                 fileInput.click();
                 return;
-            } els if (currentApiType === "denoise") {
-                resultDiv.innerHTML = "🎵 Reducción de ruido: función en desarrollo. Por ahora, usa un software externo.";
+            } else if (currentApiType === "denoise") {
+                resultDiv.innerHTML = "🎵 Reducción de ruido: función en desarrollo.";
                 return;
-            } els if (currentApiType === "colorize") {
+            } else if (currentApiType === "colorize") {
                 resultDiv.innerHTML = "🎨 Selecciona una imagen B/N para colorear...";
                 let fileInput = document.createElement("input");
                 fileInput.type = "file";
@@ -1384,16 +820,16 @@
             resultDiv.innerHTML = `❌ Error en la API: ${error.message}<br>Verifica tu clave y conexión.`;
         }
     }
-    
-    // ============ RENDERIZADO CON CLOUDCONVERT (usando clave de localStorage) ============
+
+    // ============ RENDERIZADO CON CLOUDCONVERT ============
     async function renderizarConCloudConvert() {
         if (timeline.image.length === 0 && timeline.video.length === 0) {
             notificar("❌ No hay imágenes o videos en el timeline para renderizar.");
             return;
         }
         let apiKey = localStorage.getItem('cloudconvert_key');
-        if (appy Key) {
-            notificar(❌ No hay clave de CloudConvert configurada. Ve al panel izquierdo y guárdala.);
+        if (!apiKey) {
+            notificar("❌ No hay clave de CloudConvert configurada. Ve al panel izquierdo y guárdala.");
             return;
         }
         notificar("☁️ Iniciando renderizado con CloudConvert...");
@@ -1415,12 +851,11 @@
             document.getElementById("aiResult").innerHTML = `Renderizado iniciado. ID: ${job.data.id}`;
             document.getElementById("aiModal").classList.add("show");
         } catch (err) {
-            notificar(❌ Error: ${err.message}`);
+            notificar(`❌ Error: ${err.message}`);
         }
     }
-    
-    // ============ RENDERIZADO LOCAL (sin cambios) ============
-    let ffmpeg = null;
+
+    // ============ RENDERIZADO LOCAL ============
     async function renderizarLocal() {
         if (timeline.image.length === 0) {
             notificar("❌ Necesitas al menos una imagen para renderizar.");
@@ -1447,7 +882,7 @@
         a.click();
         notificar("✅ Renderizado local completado. Descargando...");
     }
-    
+
     // ============ CREAR VIDEO COMPLETO ============
     async function crearVideoCompleto() {
         if (timeline.image.length === 0 && timeline.video.length === 0) {
@@ -1460,16 +895,12 @@
             await ffmpeg.load();
             notificar("✅ FFmpeg listo");
         }
-        
         try {
-            let clipsImagen = [...timeline.image].sort((a,b) => a.start - b.start);
-            if (clipsImagen.length === 0) {
-                notificar("❌ No hay imágenes en el timeline.");
-                return;
+            let clipsImagen = [...timeline.image].sort((a, b) => a.start - b.start);
+            if (clipsImagen.length === 0) { notificar("❌ No hay imágenes en el timeline."); return;
             }
             let tempFiles = [];
             let concatList = "";
-            
             for (let i = 0; i < clipsImagen.length; i++) {
                 const clip = clipsImagen[i];
                 const url = clip.archivo;
@@ -1480,17 +911,14 @@
                 const ext = url.split('.').pop().split('?')[0] || 'jpg';
                 const inputName = `img_${i}.${ext}`;
                 ffmpeg.FS('writeFile', inputName, new Uint8Array(arrayBuffer));
-                
                 const outputTemp = `temp_${i}.mp4`;
                 let duracion = clip.duration || 8;
                 await ffmpeg.run('-loop', '1', '-i', inputName, '-c:v', 'libx264', '-t', duracion.toString(), '-pix_fmt', 'yuv420p', '-vf', 'scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2', outputTemp);
                 concatList += `file '${outputTemp}'\n`;
                 tempFiles.push(outputTemp);
             }
-            
             ffmpeg.FS('writeFile', 'concat_list.txt', concatList);
             await ffmpeg.run('-f', 'concat', '-safe', '0', '-i', 'concat_list.txt', '-c', 'copy', 'video_sin_audio.mp4');
-            
             let audioFiles = [];
             for (let aud of audioElementos) {
                 const response = await fetch(aud.audio.src);
@@ -1500,20 +928,16 @@
                 ffmpeg.FS('writeFile', audioName, new Uint8Array(arrayBuffer));
                 audioFiles.push(audioName);
             }
-            
             let finalFile = "video_final.mp4";
             if (audioFiles.length > 0) {
                 let audioConcat = "";
-                for (let i = 0; i < audioFiles.length; i++) {
-                    audioConcat += `file '${audioFiles[i]}'\n`;
-                }
+                for (let i = 0; i < audioFiles.length; i++) audioConcat += `file '${audioFiles[i]}'\n`;
                 ffmpeg.FS('writeFile', 'audio_list.txt', audioConcat);
                 await ffmpeg.run('-f', 'concat', '-safe', '0', '-i', 'audio_list.txt', '-c', 'copy', 'audio_total.mp3');
                 await ffmpeg.run('-i', 'video_sin_audio.mp4', '-i', 'audio_total.mp3', '-c:v', 'copy', '-c:a', 'aac', '-map', '0:v:0', '-map', '1:a:0', '-shortest', finalFile);
             } else {
                 finalFile = "video_sin_audio.mp4";
             }
-            
             const data = ffmpeg.FS('readFile', finalFile);
             const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
             const url = URL.createObjectURL(videoBlob);
@@ -1522,34 +946,34 @@
             a.download = `emi1719_video_${Date.now()}.mp4`;
             a.click();
             notificar("✅ Video completo creado y descargado.");
-            
-            for (let f of tempFiles) try { ffmpeg.FS('unlink', f); } catch(e) {}
-            try { ffmpeg.FS('unlink', 'concat_list.txt'); } catch(e) {}
-            try { ffmpeg.FS('unlink', 'video_sin_audio.mp4'); } catch(e) {}
-            try { ffmpeg.FS('unlink', 'audio_total.mp3'); } catch(e) {}
-            for (let af of audioFiles) try { ffmpeg.FS('unlink', af); } catch(e) {}
-            
+            for (let f of tempFiles) try { ffmpeg.FS('unlink', f);
+            } catch(e) {}
+            try { ffmpeg.FS('unlink', 'concat_list.txt');
+            } catch(e) {}
+            try { ffmpeg.FS('unlink', 'video_sin_audio.mp4');
+            } catch(e) {}
+            try { ffmpeg.FS('unlink', 'audio_total.mp3');
+            } catch(e) {}
+            for (let af of audioFiles) try { ffmpeg.FS('unlink', af);
+            } catch(e) {}
         } catch (err) {
             notificar(`❌ Error al crear video: ${err.message}`);
             console.error(err);
         }
     }
-    ³
+
     // ============ GUARDAR AUDIO MP3 ============
     async function guardarAudioMP3() {
-        if (audioElementos.length === 0) {
-            notificar("❌ No hay clips de audio en el timeline.");
-            return;
-        }
+        if (audioElementos.length === 0) { notificar("❌ No hay clips de audio en el timeline.");
+        return; }
         notificar("🎵 Preparando audio para exportar...");
         if (!ffmpeg) {
             ffmpeg = new FFmpeg.createFFmpeg({ log: true });
             await ffmpeg.load();
             notificar("✅ FFmpeg listo");
         }
-        
         try {
-            let audiosOrdenados = [...audioElementos].sort((a,b) => a.start - b.start);
+            let audiosOrdenados = [...audioElementos].sort((a, b) => a.start - b.start);
             let audioFiles = [];
             for (let i = 0; i < audiosOrdenados.length; i++) {
                 const aud = audiosOrdenados[i];
@@ -1561,14 +985,10 @@
                 audioFiles.push(inputName);
                 notificar(`🎵 Procesando audio ${i+1}/${audiosOrdenados.length}`);
             }
-            
             let concatList = "";
-            for (let f of audioFiles) {
-                concatList += `file '${f}'\n`;
-            }
+            for (let f of audioFiles) concatList += `file '${f}'\n`;
             ffmpeg.FS('writeFile', 'concat_audio.txt', concatList);
             await ffmpeg.run('-f', 'concat', '-safe', '0', '-i', 'concat_audio.txt', '-c', 'copy', 'audio_final.mp3');
-            
             const data = ffmpeg.FS('readFile', 'audio_final.mp3');
             const audioBlob = new Blob([data.buffer], { type: 'audio/mpeg' });
             const url = URL.createObjectURL(audioBlob);
@@ -1577,20 +997,24 @@
             a.download = `emi1719_audio_${Date.now()}.mp3`;
             a.click();
             notificar("✅ Audio MP3 guardado.");
-            
-            for (let f of audioFiles) try { ffmpeg.FS('unlink', f); } catch(e) {}
-            try { ffmpeg.FS('unlink', 'concat_audio.txt'); } catch(e) {}
-            try { ffmpeg.FS('unlink', 'audio_final.mp3'); } catch(e) {}
+            for (let f of audioFiles) try { ffmpeg.FS('unlink', f);
+            } catch(e) {}
+            try { ffmpeg.FS('unlink', 'concat_audio.txt');
+            } catch(e) {}
+            try { ffmpeg.FS('unlink', 'audio_final.mp3');
+            } catch(e) {}
         } catch (err) {
-            notificar❌ Error al guardar audio: ${ err message}`);
+            notificar(`❌ Error al guardar audio: ${err.message}`);
         }
     }
-    
+
+    // ============ UTILIDADES ============
     function actualizarContadores() {
         document.getElementById("videoCount").innerText = timeline.video.length;
         document.getElementById("audioCount").innerText = timeline.audio.length;
         document.getElementById("imageCount").innerText = timeline.image.length;
     }
+
     function notificar(msg) {
         let d = document.createElement("div");
         d.textContent = msg;
@@ -1598,6 +1022,7 @@
         document.body.appendChild(d);
         setTimeout(() => d.remove(), 2000);
     }
+
     function initNavegacion() {
         document.querySelectorAll(".nav-btn").forEach(btn => {
             btn.onclick = () => {
@@ -1615,10 +1040,7 @@
             };
         });
     }
-    function cargarDemos() {
-        // DEMOS DESACTIVADAS: ya no se cargan automáticamente
-        notificar("🎬 EMI 1719 listo. Importa tus fotos, audios y usa las APIs reales.");
-    }
+
     function init() {
         renderCategorias();
         actualizarListaFiltrada();
@@ -1627,7 +1049,7 @@
         dibujarPreview();
         initNavegacion();
         cargarClavesEnPanel();
-        
+
         document.getElementById("importVideoBtn").onclick = importarVideo;
         document.getElementById("importImageBtn").onclick = importarImagen;
         document.getElementById("importAudioBtn").onclick = importarAudio;
@@ -1636,7 +1058,17 @@
         document.getElementById("stopBtn").onclick = detenerTimeline;
         document.getElementById("zoomIn").onclick = () => { zoom = Math.min(100, zoom + 2); renderTimeline(); };
         document.getElementById("zoomOut").onclick = () => { zoom = Math.max(2, zoom - 2); renderTimeline(); };
-        document.getElementById("resetTimeline").onclick = () => { timeline = { video: [], audio: [], image: [], motion: [] }; imagenesCargadas = []; audioElementos = []; animaciones = []; nextClipId = 1; detenerTodosAudios(); renderTimeline(); actualizarContadores(); notificar("⟳ Timeline reiniciada"); };
+        document.getElementById("resetTimeline").onclick = () => {
+            timeline = { video: [], audio: [], image: [], motion: [] };
+            imagenesCargadas = [];
+            audioElementos = [];
+            animaciones = [];
+            nextClipId = 1;
+            detenerTodosAudios();
+            renderTimeline();
+            actualizarContadores();
+            notificar("⟳ Timeline reiniciada");
+        };
         document.getElementById("searchTools").oninput = (e) => { busqueda = e.target.value; actualizarListaFiltrada(); };
         document.getElementById("closeAiModal").onclick = () => { document.getElementById("aiModal").classList.remove("show"); };
         document.getElementById("renderCloudConvertBtn").onclick = renderizarConCloudConvert;
@@ -1650,9 +1082,10 @@
         document.getElementById("nextIaBtn").onclick = nextIa;
         document.getElementById("applyIaBtn").onclick = aplicarIaActual;
         document.getElementById("saveAllKeysBtn").onclick = guardarTodasLasClaves;
-        
-cargarDemos();}
+        notificar("🎬 EMI 1719 listo. Importa tus fotos, audios y usa las APIs reales.");
+    }
+
     init();
 </script>
 </body>
-</html>  
+</html>
